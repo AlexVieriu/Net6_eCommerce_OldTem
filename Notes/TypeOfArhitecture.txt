@@ -1,0 +1,163 @@
+﻿1. Command Query Responsibility Separation(CQRS)
+-> seperate commands from queries
+
+https://www.youtube.com/watch?v=dK4Yb6-LxAk&t=497s&ab_channel=GOTOConferences
+
+2. Clean arhitecture
+Domain layer		: enterprise logic and types (is specific to this system)
+Application layer	: business logic and types	 (many systems)
+Core Layer			: Presentation
+					  Infrastructure
+
+-> Core Layer doesn't depend on anything, adding abstraction/interfaces within the Application Layer
+
+ex(1:20): if we want to implement a Repository Pattern, we add IRepository in the "Application", 
+		  and an implementation in the "Infrastructure"
+
+Advantages:
+-> testable
+-> independent of frameworks
+-> independent of the UI
+-> independent of the database
+-> independent anything external
+
+Clean Architecture Template : https://github.com/jasontaylordev/CleanArchitecture
+
+I. Domain Layer
+-> Entities			: a row in a database (https://binaryterms.com/difference-between-entity-and-attribute-in-database.html)
+-> Value Objects	 
+-> Enumerations
+-> Logic
+-> Exceptions
+
+-> don't use Data anotation in the Domain Model :
+[Required]
+[StringLength(4000)]
+public string Note { get; set;}
+
+-> in a try/catch block, for better debugging, we need to create our own Exception
+
+try{
+	...
+}
+
+catch(Exception e)
+{
+	throw new MyException(e);
+}
+
+Key Points:
+-> avoid using data annotations in the DOMAIN MODEL
+
+ https://www.youtube.com/watch?v=OIZ-ROcMmI8&ab_channel=CodingConcepts
+-> use value objects where appropriate  : -> (1:00) measures, quantifies, describes something in your domain 
+										  -> (2:30) they are immutable (https://www.youtube.com/watch?v=D1LkYP8MYzQ&ab_channel=.NETInterviewPreparationvideos)
+										  -> (3:43) maintain referential identity, but lack their own identity
+										  -> (5:10) side effect free functions
+
+-> create custom domain exceptions		: custom try/catch exception 
+
+-> initialise all collections(at the constructor level) & use private setters :	
+			 LineItems = new List<OrderLineItem>();		
+			 
+-> automatically track changes 
+
+
+II. Application Layer
+-> we have interfaces that will be implemented in the outside of the Application Layer
+
+-> Interfaces
+-> Models
+-> Logic
+-> Commands/Queries
+-> Validators
+-> Exceptions 
+
+CQRS(Command Query Reponsibility Segregation)
+-> Separate reads(queries) from writes(commands)
+-> Can maximise performance, scalability and simplicity
+-> Easy to add new features, just add a new query or command
+-> Easy to maintain, changes only affect one command or query
+
+CQRS + MediatR(library)
+-> define commands and queries as requests
+-> application layer is just a series of request/response objects
+-> ability to attach additional behaviour before and/or after each request, logging, validation, caching, authorisation...
+	ex: if we want to validate a request that comes and go, we can do that 
+
+-> create a static class that have all the Dependency Injection, so that the Startup.cs will not get bigger
+
+public static class DependencyInjection
+{
+	public static IServiceCollection AddAplication(this IServiceCollection services)
+	{
+		services.AutoMapper(...)
+		services.AddTransient(...)
+		services.AddTransient(...)
+		services.AddScoped(...)
+		services.AddSingleton(...)
+	}
+}
+
+-- Startup.cs -- 
+public void ConfigurareServices(IServiceCollecntion services)
+{
+	services.AddApplication();
+
+	....
+}
+
+(31:30)
+Key Points:
+-> using CQRS + MediatR simplifies your overall design
+-> MediatR simplifies cross cutting concerns
+-> Fluent Validation is usefull for all validation scenarios
+-> Automapper simplifies mapping and projections
+
+
+(31:50)
+III. Infrastructure
+-> Persistence
+-> Identity
+-> File system
+-> System Clock
+-> API clients
+
+Unit of Work and Repository Patterns 
+
+-> Should we implement these patterns? 
+
+It isn't always the best choise, because;
+-> EF Core insulates your code from database changes
+-> DbContext acts as a unit of work
+-> DbSet acts as a repository
+-> EF Core has features for unit testing without repository
+
+When to use it?
+-> if we don't depend on the Entity Framework Core, unit of work is good
+-> if we want to limit access to some Entities
+
+
+Key Points:
+-> Independent of the database
+-> use fluent API configuration over data annotations
+-> prefer conventions over configuration
+-> automatically apply all entity type configurations
+-> no layer depend on the Infrastructure layer
+
+
+IV. Presentation
+-> SPA - Angular, React, Vue
+-> Web API
+-> Razor Pages
+-> MVC
+-> Web Forms
+
+
+Key Points:
+-> controllers should not contain any application logic
+-> create and consume well defined view models
+-> open API bridge the gap between the front end and back end
+-> NSwag automates generation of Open API specification and clients
+
+

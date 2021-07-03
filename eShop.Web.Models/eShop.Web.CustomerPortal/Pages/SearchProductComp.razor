@@ -1,0 +1,38 @@
+﻿@page "/products"
+@page "/"
+
+@inject ISearchProductUseCase searchRepo
+
+<SearchBarComp OnSearch="SearchHandler" />
+
+@if (products != null && products.Count() > 0)
+{
+    <div class="row">
+        @foreach (var product in products)
+        {
+            <ProductCardComp Product="product" />
+        }
+    </div>
+}
+
+else
+{
+    <text>No products found</text>
+}
+
+@code{
+    private IEnumerable<Product> products;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        
+        // get all the products
+        products = searchRepo.Execute();
+    }
+
+    private void SearchHandler(string filter)
+    {
+        products = searchRepo.Execute(filter);
+    }
+}

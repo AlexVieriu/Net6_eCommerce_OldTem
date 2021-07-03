@@ -1,0 +1,486 @@
+﻿24. Data Binding Part 1
+
+-> create a <label> and <textbox> to demonstait one-way and two-way databiding 
+-> create a checkbox
+-> create a radio button
+-> create a select element DropDownList
+
+-- Index.razor --
+
+UI:
+
+-> one way data binding : State-> View
+	Product Name: @product.Name
+
+-> two ways data binding: State-> View, View->State
+	<input type="text" @bind-value="@product.Name" @bind-value:event="oninput" />
+
+CheckBox:
+<input type="checkbox" @bind-value="isActive">
+@isActive
+
+
+@Code:
+
+private bool isActive;
+Product product = new Product(){....};
+
+Radio Component:
+
+https://youtu.be/Yp1WmfjadMw?t=1597
+https://www.learmoreseekmore.com/2020/12/blazorwasm-inputradiogroup-overview.html
+https://stackoverflow.com/questions/65275006/microsoft-aspnetcore-components-forms-inputradiogroup-does-not-support-the-type
+
+
+Method 1
+<label>
+    <input type="radio" name="group" value="1" @onclick="@(()=> selectedGroup = 1)"/> 1
+</label>
+<label>
+    <input type="radio" name="group" value="2" @onclick="@(()=> selectedGroup = 2)"/> 2
+</label>
+
+
+Method 2:
+<EditForm Model="enumNames">
+    <p>Item selected: @enumNames</p>
+    <InputRadioGroup @bind-Value="enumNames">
+        @foreach (var item in (EnumNames[])Enum.GetValues(typeof(EnumNames)))
+        {
+            <InputRadio Value="item" />
+            @(" " + item)
+            <br />
+        }
+    </InputRadioGroup>
+</EditForm>
+
+
+Method 3:
+<EditForm Model="newCustomerObj">
+    <p>Item selected: @newCustomerObj.Name</p>
+    <InputRadioGroup @bind-Value="newCustomerObj.Name">
+        @foreach (var item in customers)
+        {
+            <InputRadio Value="item.Name" />
+            @(" " + item.Name)
+            <br />
+        }
+    </InputRadioGroup>
+</EditForm>
+
+
+26. Overview of Communication between Components
+
+-> page components
+-> non-page components(reusable components)
+	-> can have multiple non-page components
+
+a. Rounting Parameters
+b. Regular Parameters
+c. Cascading Parameters
+d. EventCallback
+e. Reference Parameters
+
+
+27. Review Parameters, Route Parameters and EventCallback
+
+I. Regular Parameters
+-> ex: pass parameter from the base component to the child component
+
+<RegularParameter Persons="persons" />
+"persons" can be: class, List<class>, Enum, .....
+
+II. Rounting Parameters
+-> pass parameter from one component to another: base comp	-> base component
+												 child comp	-> base component
+ex: @page "/product/{id:int}"
+
+III. EventCallback
+
+-> use EventCallback when we want to transfer data(filter, List<Customer>, ...) from 
+Child to Base component
+
+-- Base Component --
+@Code:
+-> declare List<Customer>
+-> get the List<Customer> : OnInizialized()
+-> FilterPersons(string filter)
+
+
+-- Child component --
+UI:
+label, input(text, @bind-value), button(@onclick)
+
+@code{
+	-> create a prop filter
+	-> create EventCallBack
+	-> create method: OnSearch.InvokeAsync(filter);
+}
+
+
+28. Cascading Parameters
+
+-> we only can cascade values from the top to the bottom, from base to child component
+
+-> create a Base Component, with a button that pass the parameter to all his childs
+-> create Component1.razor, Component2.razor
+
+BaseComponent:
+<CascadingValue Name="TestCounter" Value="counter">
+
+ChildComponent:
+[CascadingParameter(Name = "TestCounter")]
+
+
+29. Referencing Child Components
+
+-> we use this when we want to call Child methods/properties  from the Base component
+
+UI:
+-> create a button that access the visibilityComponent method
+-> declare <Visibility> with the @ref so we can display it
+
+@code:
+-> write the @onclick event that access the method from the child component
+
+
+30. RenderFragment
+
+-> used when we want to customize the Child Component from Base Component
+
+-- RenderFragmentComp --
+
+UI: 
+<TemplatedComponent Items="products" TItems="Product">
+	<Header>
+	<ReapeaterItem Context="item">
+       <p>Name: @item.Name</p>
+       <p>Brand: @item.Brand</p>
+       <p>Description: @item.Description</p>      
+	<Footer>
+
+@Code:
+{
+	create a List of Products
+}
+
+
+-- TemplaterComponent.razor --
+
+UI: 
+
+@Header
+foreach(...)
+@Footer
+
+
+@code:
+
+RenderFragment Header 
+RenderFragment Footer
+List<TItems> Items 
+RenderFragment<TItems> RepeaterItem 
+
+
+31. When does a component render
+
+-- WASM project -- 
+
+Debugging:
+I. In Visual Studio:
+-> Start Without Debugging (Ctrl+F5) isn't supported.
+
+II. In Browser:
+-> shift + alt + d
+-> copy link in Win + R
+-> shift + alt + d in the new Debugging Windows app
+(don't forget to delete the link from the previos point in: launchSettings.json)
+//"inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}"
+
+Link: https://docs.microsoft.com/en-us/aspnet/core/blazor/debug?view=aspnetcore-6.0&tabs=visual-studio
+
+
+Component LifeCycle: 
+https://blazor-university.com/components/component-lifecycles/
+https://docs.microsoft.com/en-us/aspnet/core/blazor/components/lifecycle?view=aspnetcore-6.0
+
+a. When components are created
+b. When components events are triggered
+c. When components parameter values are changed 
+d. When developers manually trigger the rendering
+
+
+a. When components are created
+	-> when you just come to the page
+	-> when you refresh the page
+	-> when you navigate away from the component/page and come back to the page that 
+	   contains the that component/page 
+
+b. When components events are triggered
+	-> even if we comment : currentCount++ , the component is still triggered
+	-> as long as an event is triggered, the component will rerender
+	-> component rerender only for UI events: click button, changing a dropdownlist, ...
+	-> the component will be rerendered only if the Event is inside the component, will not work for 
+	the events outside the component
+
+ex1: if we have a button in the parent component, the child component will not be rendered(and vis versa)
+
+Solution/Exception: use RenderFragment to pass the event from the child to the parent, 
+so the component rerender
+					
+c. When components parameter values are changed 
+use [Parameter] to pass the event to the child, so the component rerender
+
+d. When developers manually trigger the rendering
+UI:
+<ChildComponent @ref="child" />
+
+@code:
+private ChildComponent child;
+
+child.Counter = currentCount;
+child.Refresh();
+
+Rerender the child component:
+public void Refresh()
+{
+    this.StateHasChanged();
+}
+
+
+32. Component Lifecycle Events
+
+Component LifeCycle: https://blazor-university.com/components/component-lifecycles/
+
+
+I. First time Rendering
+-> when the page is just loaded
+-> when you navigate to the component
+
+Methods: 
+-> SetParameterAsync()	: This method is executed whenever the parent renders.
+						  The base.SetParametersAsync method must be executed before any await instructions 
+						  in the method, otherwise an InvalidOperationException will be thrown.
+
+-> OnInitialized / 
+   OnInitializedAsync	: Once the state from the ParameterCollection has been assigned to the 
+						  component’s [Parameter] properties, these methods are executed
+						  This method is only executed once when the component is first created. 
+						  If the parent changes the component’s parameters at a later time, 
+						  this method is skipped.
+
+-> OnParametersSet/
+   OnParametersSetAsync	: This method will be executed immediately after OnInitializedAsync 
+						  if this is a new instance of a component
+						  If it is an existing component that is being re-rendered because its parent is 
+						  re-rendering then the OnInitialized* methods will not be executed, and this method 
+						  will be executed immediately after SetParametersAsync instead.
+
+-> StateHasChanged		: This method flags the component to be rendered.
+						  A component will call this method whenever it wants to inform Blazor that changes 
+						  have occurred that would result in the rendered output being different.
+
+-> ShouldRender			: This method can be used to prevent the component’s RenderTree from being 
+						  recalculated by returning false
+						  * This method is not executed the first time the component is rendered
+
+-> BuildRenderTree		: This method renders the component’s content to an in-memory representation 
+						  of what should be rendered to the user.
+
+OnAfterRender / 
+OnAfterRenderAsync		: These last two methods are executed every time Blazor has re-generated the 
+						  component’s RenderTree.
+						  It is not until after the OnAfterRender methods have executed that it is safe to 
+						  use any references to components set via the @ref directive.
+
+Dispose					: Although this isn’t strictly one of the ComponentBase’s lifecycle methods, 
+						  if a component implements IDisposable then Blazor will execute Dispose once 
+						  the component is removed from its parent’s render tree. To implement IDisposable 
+						  we need to add @implements IDisposable to our razor file.
+
+
+Methods:  OnAfterRender()
+
+-> the double loading happens when the app is loaded for the very first time !!
+-> the Blazor code executes on await only the first time
+-> subsequent awaits will not cause multiple renders. For example: 
+
+protected override async Task OnParametersSetAsync()
+{
+  // Automatically renders when next line starts to await
+  await Task.Delay(1000); 
+  // No automatic render when next line starts to await
+  await Task.Delay(1000); 
+  // No automatic render when next line starts to await
+  await Task.Delay(1000); 
+}
+
+protected override async Task OnParametersSetAsync()
+{
+  // Automatically renders when next line starts to await
+  await Task.Delay(1000); 
+  // Explicitly render when next line starts to await
+  StateHasChanged();
+  await Task.Delay(1000); 
+  // Explicitly render when next line starts to await
+  StateHasChanged();
+  await Task.Delay(1000); 
+}
+
+
+II. Rerendering
+(8:30)
+-> add a button to base and  child component
+
+a. adding a parameter for the child component
+
+-> how the methods are called when we go on the Base Page: 
+Parent - SetParametersAsync
+	   - OnInitialized
+	   - OnParametersSet
+	Child - SetParametersAsync
+	Child - OnInitialized
+	Child - OnParametersSet
+
+
+-> how the methods are called when we press the Button: 
+Parent  - OnClick()
+		- ShouldRender
+	Child - SetParametersAsync
+	Child - OnPArametersSet
+	Child - ShouldRender
+Parent - OnAfterRender
+	Child - OnAfterRender
+
+
+b. without adding paramenter for the child component
+
+How the methods are called: 
+Parent	- OnClick()
+		- ShouldRender
+		- OnAfterRender
+
+-> the child component is not rendered ! 
+
+
+33. Forms and Validations
+
+-> blazor is a single pg app: only the first pageload goes to the HttpRequest and response pipeline
+-> the subsequent actions will not be postback to the backend in order to perform submissions
+
+Resolution:
+<EditForm>,<InputText>,<InputNumber>
+
+-> <EditForm> must be bind to a Model
+
+@bind-Value: use inside the <EditForm>
+@bind-value: use ouside the <EditForm>
+
+UI:
+-> create a EditForm with fields from class Person
+-> display the Person fields
+
+@code:
+-> Create class Person and put validations
+-> create an obj of type Person: FirstName, LastName, EmployerNumber, Email
+-> create a submit method for the OnValidSubmit: ValidFormSubmitted()
+
+
+34. State Management with Observer Pattern
+
+Recap:
+-> Encapsulation: {get; set;}
+-> Delegates : https://www.youtube.com/watch?v=R8Blt5c-Vi4&ab_channel=IAmTimCorey
+
+Action delegate : https://www.tutorialsteacher.com/csharp/csharp-action-delegate
+Func delegate	: https://www.tutorialsteacher.com/csharp/csharp-func-delegate
+
+
+Action<T> Delegate:
+	-> Encapsulates a method that has a single parameter and does not return a value.
+
+Func<T,TResult> Delegate
+	-> Encapsulates a method that has one parameter and returns a value of the type specified by the TResult parameter.
+
+-- Action: 
+
+static void ConsolePrint(int i)
+{
+    Console.WriteLine(i);
+}
+
+static void Main(string[] args)
+{
+    Action<int> printActionDel = ConsolePrint;
+    printActionDel(10);
+}
+
+-- Func: 
+static int Sum(int x, int y)
+{
+    return x + y;
+}
+
+static void Main(string[] args)
+{
+    Func<int,int, int> add = Sum;
+
+    int result = add(10, 10);
+
+    Console.WriteLine(result); 
+}
+
+
+-> STATE is at the component level or can be passed between components
+-> but when you start writing more complex code, have complex projects, you need to save State outside of the component 
+so every component in the page related to one another or NOT can access that STATE
+
+
+IDisposable	: Provides a mechanism for releasing unmanaged resources.
+Dispose()	: Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+
+
+a. When access the Page
+- NavMenu
+	- OnInitialized
+- CounterStore
+	- AddStateChangeListeners
+- NavMenu
+	StateHasChanged(): Notifies the component that its state has changed. When applicable, this will
+						 cause the component to be re-rendered.
+
+
+
+-> we need to put breakpoint at every method to see the steps
+b. When we press counter button:
+
+- CounterStateManager
+	- IncremetCounter()
+- CounterStore
+	- BroadcastStateChange()
+- NavMenu
+- CounterStore
+	- GetState()
+- CounterState
+
+
+
+-- CounterStateManager.razor --
+UI:
+<button @onclick = "IncrementCounter">
+<p>@counterStore.GetState().Count</p>
+
+@code:
+OnInitialized()
+IncrementCounter()
+UpdateView()
+Dispose()
+
+
+-- CounterStore.cs --
+
+CounterState.cs
+Count { get; }
+ctor(int count)
+
+CounterStore.cs

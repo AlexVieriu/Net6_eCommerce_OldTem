@@ -1,0 +1,96 @@
+﻿Project Structure:
+
+-> eShop.Web.Models		-> eShop.Web.AdminPortal		-> Controls		-> OrderItemComp.razor
+																		-> OrderListComp.razor
+														
+														-> Pages		-> OrderItemComp.razor
+																		-> OrderListComp.razor
+
+						-> eShop.Web.Common				-> Controls		-> Logincomp.razor
+														
+														-> ViewModel	-> LoginViewModel.cs
+														
+						-> eShop.Web.CustomerPortal		-> Controls		-> CardComp.razor
+																		-> CustomerFormComp.razor
+																		-> LineItemComp.razor
+																		-> OrderSummaryComp.razor
+																		-> ProductCardComp.razor
+																		-> ProductItemComp.razor
+																
+														-> Pages		-> OrderConfirmationComp.razor
+																		-> PlaceOrderComp.razor
+																		-> SearchBarComp.razor
+																		-> SearchProductComp.razor
+																		-> ShoppingCardComp.razor
+																		-> ViewProductComp.razor
+														
+														-> ViewModels	-> CustomerViewModel.cs
+	
+-> Plugins				-> eShop.DataStore								-> OrderRepository.cs	
+																		-> ProductRepository.cs
+						
+						-> eShop.DataStore.SQL.Dapper	-> Helpers		-> DataAccess.cs
+																		
+																		-> OrderRepository.cs		
+																		-> ProductRepository.cs
+
+						-> eShop.ShoppingCard.LocalStorage				-> ShoppingCard.cs		
+
+						-> eShop.StateStore.DI							-> ShoppingCardStateStore.cs
+																		-> StateStoreBase.cs
+
+-> eShop.CoreBusiness	-> Models										-> Order.cs
+																		-> OrderLineItems.cs
+																		-> Product.cs
+							
+						-> Services										-> IOrderService.cs
+																		-> OrderService.cs
+							
+-> eShop.UseCases
+
+	-> AdminPortal		-> OrderDetailScreen			-> Interfaces	-> IProcessOrderUseCases.cs
+																		-> IViewOrderDetailUseCase.cs
+																		
+																		-> ProcessOrderUseCase.cs
+																		-> ViewOrderDetailUseCase.cs
+						
+						-> OutStadingOrdersScreen						-> IViewOutstandingOrdersUseCase.cs
+																		-> ViewOutstandingOrdersUseCase.cs
+						
+						-> ProcessedOrdersScreen						-> IViewProcessedOrdersUseCase.cs
+																		-> ViewProcessedOrdersUseCase.cs
+													
+	-> CustomerPortal	-> OrderConfirmationScreen						-> IViewOrderConfirmationUseCase.cs
+																		-> ViewOrderConfirmationUseCase.cs
+						
+						-> PluginInterfaces				-> DataStore	-> IDataAccess.cs
+																		-> IProductRepository.cs
+																		-> IOrderRepository.cs
+																		
+														-> StateStore	-> IShoppingCardStateStore.cs
+																		-> IStateStore.cs
+
+														-> UI			-> IShoppingCard.cs
+
+						-> SearchProductScreen							-> ISearchProductUseCases.cs 
+																		-> SearchProductUseCase.cs
+							
+						-> ShoppingCardScreen			-> Interfaces	-> IDeleteProductUseCase.cs																		
+																		-> IPlaceOrderUseCases.cs																																				
+																		-> IUpdateQuantityUseCase.cs																																				
+																		-> IViewShoppingCardUseCase.cs
+
+																		-> DeleteProductUseCase.cs
+																		-> PlaceOrderUseCases.cs
+																		-> UpdateQuantityUseCase.cs
+																		-> ViewShoppingCardUseCase.cs
+																																	
+						-> ViewProductScreen			-> Interfaces	-> IAddProductToCardUseCase.cs
+																		-> IViewProductUseCase.cs
+
+																		-> AddProductToCardUseCase.cs
+																		-> ViewProductUseCase.cs
+
+-> eShop.Web		-> Controllers										-> AuthenticationController
+
+					-> Shared											-> TopNavBar

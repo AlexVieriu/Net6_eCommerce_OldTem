@@ -1,0 +1,59 @@
+﻿@page "/product/{id:int}"
+
+@inject NavigationManager navManager
+
+@inject IViewProductUseCase viewProduct
+@inject IAddProductToCartUseCase addProductToCard
+
+@*Boostrap Card*@
+
+<h3>Product Details</h3>
+
+<div class="card" style="width: 30rem;">
+    <div class="card-body">
+
+        <img src=@product.ImageLink />
+
+        <h5 class="card-title">@product.Name</h5>
+
+        <h6 class="card-subtitle mb-2 text-muted">@product.Brand</h6>
+        <hr />
+        <p>
+            Price: <label style="color:darkred">@product.Price.ToString("c")</label>
+        </p>
+
+        <p class="card-text">@product.Description</p>
+    </div>
+    <button class="btn btn-primary" @onclick="AddToCard">Add to Card</button>    
+</div>
+
+<br />
+
+<a href="/products" class="btn btn-primary" @onclick="BackToList">Back To List</a>
+
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    public Product product { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Id > 0)
+            product = viewProduct.Execute(Id);
+    }
+
+    private void AddToCard()
+    {
+        addProductToCard.Execute(product.ProductId);
+        navManager.NavigateTo("/");
+    }
+
+    private void BackToList()
+    {
+        navManager.NavigateTo("/");
+    }
+}

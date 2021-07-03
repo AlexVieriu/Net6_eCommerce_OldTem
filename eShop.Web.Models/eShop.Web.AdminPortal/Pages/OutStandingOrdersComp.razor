@@ -1,0 +1,22 @@
+﻿@page "/outstandingorders"
+
+@attribute [Authorize]
+
+@inject IViewOutstandingOrdersUseCase viewOutstandingOrdersUseCase
+
+<h3>Outstanding Orders</h3>
+<br />  
+<OrderListComp Orders="orders"/>
+
+
+@code{
+    private IEnumerable<Order> orders;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        orders = viewOutstandingOrdersUseCase.Execute(); 
+        // GetOutstadingOrders() -> allOrders.Where(x => x.DateProcessed.HasValue == false)
+    }
+}

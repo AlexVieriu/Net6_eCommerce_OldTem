@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\eShop.CoreBusiness\eShop.CoreBusiness.csproj" />
+    <ProjectReference Include="..\eShop.DataStore.SQL.Dapper\eShop.DataStore.SQL.Dapper.csproj" />
+    <ProjectReference Include="..\eShop.UseCases\eShop.UseCases.csproj" />
+    <ProjectReference Include="..\eShop.Web.Models\eShop.Web.AdminPortal\eShop.Web.AdminPortal.csproj" />
+    <ProjectReference Include="..\eShop.Web.Models\eShop.Web.Common\eShop.Web.Common.csproj" />
+    <ProjectReference Include="..\eShop.Web.Models\eShop.Web.CustomerPortal\eShop.Web.CustomerPortal.csproj" />
+    <ProjectReference Include="..\Plugins\eShop.DataStore\eShop.DataStore.csproj" />
+    <ProjectReference Include="..\Plugins\eShop.ShoppingCard.LocalStorage\eShop.ShoppingCard.LocalStorage.csproj" />
+    <ProjectReference Include="..\Plugins\eShop.StateStore.DI\eShop.StateStore.DI.csproj" />
+  </ItemGroup>
+
+</Project>

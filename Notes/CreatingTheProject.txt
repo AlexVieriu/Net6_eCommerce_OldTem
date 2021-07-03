@@ -1,0 +1,155 @@
+﻿-> Create a the road map
+-> add Assembly for CustomerProtal
+
+-> SearchBarComp.razor      : Form Bootstrap
+-> ProductItemComp.razor    : Card Bootstrap
+-> SearchProductsComp.razor
+-> ViewProductComp.razor    : Card + Button(Add to Cart) + Button(Back to List)
+
+-> Product.cs
+
+-> SearchProductUseCase.cs, ISearchProductUseCase.cs
+-> ViewProductUseCase.cs, IViewProductUseCase.cs
+-> ProductRepository.cs, IProductReository.cs
+-> SearchProductComp.razor
+
+-> Order.cs				:   OrderId, DatePlaced, DateProcessing, DateProcessed, CustomerName, CustomerAddress, 
+                            CustomerCity, CustomerStateProvince, CustomerCountry, AdminUser, LineItems, UniqueId, 
+
+                            AddProduct(int productId, int qty, double price), RemoveProduct(int productId)
+                            
+-> OrderLineItem.cs		:   LineItemId, ProductId, Price, Quantity, OrderId, Product
+-> OrderService.cs		:
+-> IOrderService.cs		:   bool ValidateCustomerInformation(string name, string address, string city, string province, string country);
+                            bool ValidateCreateOrder(Order order);  
+                                -> order has exist
+                                -> order has to have order line items
+                                -> validationg line items (check ProductId, Price, Quantity)
+                                -> ValidateCustomerInformation()
+                            bool ValidateProcessOrder(Order order);
+                                -> DataProcessed, AdminUser
+                            bool ValidateUpdateOrder(Order order);
+                                -> order has to exist
+                                -> order has to have order line items
+                                -> Placed Date has to be populate
+                                -> validate uniqueId
+                                -> validation line items
+                                -> validate customer info
+-> IShoppingCart(43)
+-> ShoppingCart (45):
+
+    Task<Order> GetOrder()
+        -> get the Product from localStorage     
+        -> add the Product
+        -> set the Order to the localStorage
+    
+    Task SetOrder(Order order)    
+    Task<Order> AddProductAsync(Product product);
+        -> get Order
+        -> add product
+        -> setOrder
+
+    Task<Order> DeleteProductAsync(int productId);
+        -> get Order
+        -> removeProduct
+        -> set Order
+
+    Task EmptyAsync();
+        -> setOrder(null)
+    Task<Order> GetOrderAsync()                                   
+    Task<Order> UpdateOrderAsync(Order order)
+        -> setOrder
+    Task<Order> UpdateQuantityAsync(int productId, int quantity); 
+        -> check quantity<0
+        -> check quantati == 0
+        -> get lineItem
+        -> check lineItem
+        -> setOrder                  
+
+-> IAddProductToCardUseCase.cs(44)  -> inject interface to ViewProductComp.razor 
+-> AddProductToCardUseCase.cs       -> get the Product, add product to the ShoppingCart
+
+
+-> TopNavBar.razor(47) (Boostrap)
+-> rename ProductItemComp.razor to ProductCartComp.razor
+
+---------- Testing  the app ----------
+
+-> ViewShoppingCartUseCase.cs (48)
+
+-> ShoppingCartComp.razor (49) : make it all with class="row" and class="col"
+    -> LineItemComp.razor (50)
+    -> OrderSummaryComp.razor(51)
+
+-> IStateStore.cs(52)
+    void AddStateChangeListeners(Action listener)
+    void RemoveStateChangeListeners(Action listener)
+    void BroadCastStateChange(Action listener)
+
+-> IShoppingCartStateStore.cs
+-> ShoppingCartStateStore.cs
+    Task<int> GetItemsCount()
+    void UpdateLineItemsCount()
+
+-> AddProductToCardUseCases.cs (add IShoppingCartStateStore)
+
+-> CardComp.razor(53)
+
+-> DeleteProductUseCase.cs(54)
+-> UpdateQuantityScreen.cs
+
+-> LineItemComp.razor(55) -> add DeleteProductUseCase, UpdateQuantityScreen to the component 
+
+-> IOrderRepository.cs (56)
+-> OrderRepository.cs
+
+-> PlaceOrderUseCase.cs(57)
+-> IPlaceOrderUseCase.cs
+
+-> PlaceOrderComp.razor(58)
+-> CustomerViewModel.cs
+-> CustomerFormComp.razor
+
+-> ViewOrderConfirmationUseCase.cs
+-> IViewOrderConfirmationUseCase.cs
+-> OrderConfirmationComp.razor 
+
+
+-> ViewOutstandingOrdersUseCase (60)
+-> IViewOutstandingOrdersUseCase
+
+-> ViewOrderDetailUseCase
+-> IViewOrderDetailUseCase
+
+-> ProcessOrderUseCase
+-> IProcessOrderUseCase
+
+
+-> OutStandingOrdersComp.razor(61)
+-> OrderListComp.razor
+-> OrderItemComp.razor
+
+-> OrderDetailComp.razor
+-> ProcessedOrderComp.razor
+
+
+------ 6.Build Admin Portal ------ 
+
+-> services.AddControllers()(62)
+-> services.AddAuthentication(...)
+           .AddCookie(...)
+
+-> app.UseAuthentication();
+-> app.UseAuthorization();
+-> endpoints.MapControllers();
+
+
+-> AuthenticationController.cs
+    Login()
+    LogOut()
+
+-> Login.razor(63)
+-> Logout.razor(64)
+
+
+

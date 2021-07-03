@@ -1,0 +1,78 @@
+﻿@inject NavigationManager navigationManager
+
+<div class="card m-2" style="width: 25rem;">
+    <div class="card-body">
+        <h5 class="card-title">Order Summary</h5>
+
+        <div class="card-text d-flex justify-content-between">
+            <div>
+                Items (@Order.LineItems.Count)
+            </div>
+            <div>
+                @itemTotalPrice.ToString("c")
+            </div>
+        </div>
+
+        <div class="card-text d-flex justify-content-between">
+            <div>
+                Shipping and Handling
+            </div>
+            <div>
+                @((0).ToString("c"))
+            </div>
+        </div>
+
+        <div class="card-text d-flex justify-content-between">
+            <div>
+                Estimated Tax
+            </div>
+            <div>
+                @((0).ToString("c"))
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="card-text d-flex justify-content-between" style="color:darkred">
+            <div>
+                Order Total:
+            </div>
+            <div>
+                @itemTotalPrice.ToString("c")
+            </div>
+        </div>
+    </div>
+    @if (!HidePlaceOrder)
+    {
+        <button class="btn btn-primary" @onclick="PlaceOrder">Place your Order</button>
+    }
+</div>
+
+
+@code{
+    private int itemCount = 0;
+    private double itemTotalPrice = 0;
+
+    [Parameter]
+    public Order Order { get; set; }
+
+    [Parameter]
+    public bool HidePlaceOrder { get; set; } = false;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Order != null)
+        {
+            itemCount = Order.LineItems.Count;
+            itemTotalPrice = 0;
+            Order.LineItems.ForEach(x => itemTotalPrice += x.Price * x.Quantity);
+        }
+    }
+
+    private void PlaceOrder()
+    {
+        navigationManager.NavigateTo("/Placeholder");
+    }
+}

@@ -1,0 +1,59 @@
+﻿
+60. Admin Use Cases
+
+eShop.UseCases.AdminPortal.OrderDetailScreen
+
+-> ViewOrderDetailUseCase.cs		: Execute(int orderId) -> GetOrder(orderId);
+-> IViewOrderDetailUseCase.cs
+-> ProcessOrderUseCase.cs			: 
+-> IProcessOrderUseCase.cs
+
+eShop.UseCases.AdminPortal.OutStandingOrdersScreen
+
+-> ViewOutstandingOrdersUseCase
+-> IViewOutstandingOrdersUseCase
+
+eShop.UseCases.AdminPortal.ProcessedOrdersScreen
+
+-> ViewProcessedOrdersUseCase
+-> IViewProcessedOrdersUseCase
+
+
+61. Admin Portal Screens
+
+-- eShop.Web.AdminPortal.Controls -- 
+
+-> OrderItemComp.razor
+	 Order
+
+-> OrderListComp.razor
+	UI	: DatePlaced, DateProcessed, Country, StateProvince, City, Name
+	Code: IEnumerable<Order> 
+
+
+-- eShop.Web.AdminPortal.Pages --
+
+-> OrderDetailComp.razor
+	UI	: 5 <p>		- Name, Address, City, StateProvice, Country (Customer)			
+		  1 <table> - Product Name, Product Price, Quantity
+		  1 <button>- HandleProcessOrder
+
+	Code: OnParametersSet() -> viewOrderDetailUseCase.Execute(int orderId)
+		  HandleProcessOrder-> processOrderUseCase.Execute(int orderId, string adminUserName)
+
+-> OutStandingOrdersComp.razor
+	 IEnumerable<Order> 
+	 OnInitialized()	: viewOutstandingOrdersUseCase.Execute(); 
+		
+-> ProcessedOrderComp.razor
+	UI	: <OrderListComp>
+
+	Code: IEnumerable<Order> orders
+		  OnInitialized() -> viewProcessedOrdersUseCase.Execute();
+
+-- eShop.Web -> Startup.cs --
+
+services.AddTransient<IViewOutstandingOrdersUseCase, ViewOutstandingOrdersUseCase>();
+services.AddTransient<IProcessOrderUseCase, ProcessOrderUseCase>();
+services.AddTransient<IViewOrderDetailUseCase, ViewOrderDetailUseCase>();
+services.AddTransient<IViewProcessedOrdersUseCase, ViewProcessedOrdersUseCase>();

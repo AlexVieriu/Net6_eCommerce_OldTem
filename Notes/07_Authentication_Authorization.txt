@@ -1,0 +1,117 @@
+﻿62. Configure Middleware and DI
+
+-> create a custom cookie authentication
+
+app.UseAuthentication()	: know how the user is
+app.UseAuthorization()	: know if the user can access the endpoint
+
+-> blazor has everything points to the same endpoint, and then with that endpoint will do his own 
+routing to different page component
+
+-> in MVC every method has there own route
+
+
+-- Startup.cs --
+
+-> ConfigureServices :
+
+services.AddControllers();
+services.AddAuthentication("eShop.CoockieAuth")
+        .AddCookie("eShop.CoockieAuth", config=>
+        {
+            config.Cookie.Name = "eShop.CookieAuth";
+            config.LoginPath = "/authenticate";
+        });
+
+
+-> Configure :
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+endpoints.MapControllers();
+
+
+63. Authentication End Point
+
+[Route("/login")]
+public async Task<IActionResult> Login([FromQuery] string user, [FromQuery] string pwd)
+{
+    if (user == "admin" && pwd == "password")
+    {
+        var userClaims = new List<Claim>()
+        {
+            new Claim(ClaimTypes.Name, user),
+            new Claim(ClaimTypes.Email, "admin@eshop.com"),
+            new Claim(ClaimTypes.HomePhone, "123123123")
+        };
+
+        var userIdentity = new ClaimsIdentity(userClaims, "eShop.CookieAuth");
+        var userPrincipal = new ClaimsPrincipal(userIdentity);
+
+        await HttpContext.SignInAsync("eShop.CookieAuth", userPrincipal);
+    }
+
+    return Redirect("/outstandingorders");
+}
+
+[Route("/logout")]
+public async Task<IActionResult> Logout()
+{
+    await HttpContext.SignOutAsync();
+    return Redirect("/outstandingorders");
+}
+
+
+64. Login Screen
+
+<EditForm>
+	<label>			UserName
+	<InputText>		UserName
+	<label>			Password
+	<InputText>		Password
+	<button>		HandleValidSubmit();
+
+@code:{
+	OnInitialized();
+	HandleValidSubmit()
+		navigationManager.NavigateTo($"/login?user={viewModel.UserName}&pwd={viewModel.Password}", forceLoad: true);
+}
+
+
+@attribute [Authorize]:
+-> OutStandingOrdersComp.razor
+-> ProcessedOrderComp.razor
+-> OrderDetailComp.razor
+
+
+-- eShop.Web -> App.razor --
+
+<AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+	<NotAuthorized>
+		<LoginComp/>
+	</NotAuthorized>
+</AuthorizeRouteView>
+
+
+65. Sign Out Screen
+
+-- eShop.Web -> App.razor --
+<CascadingAuthenticationState>
+
+
+-- eShop.Web.AdminPortal -> Pages -> OrderDetailComp.razor --
+
+private AuthenticationState authState;
+
+[CascadingParameter]
+public Task<AuthenticationState> authStateTask { get; set; }
+
+protected async override Task OnInitializedAsync()
+{
+    authState = await authStateTask;
+}
+
+
+-- OutstadingOrdersComp.razor --
+@page "/admin"

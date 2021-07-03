@@ -1,0 +1,324 @@
+﻿10. Screen Mockup and Components Breakdown
+
+-> create a mockup for the site
+
+MVC:
+Sparation of concerns : -> Business Layer		(Model)
+						-> Presentation Layer	(View)						
+						-> Resource Access Layer(Controller)
+
+State, View, Event -> are in the same file
+
+-> in razor pages we have all 3 in the same file
+-> in this case razor file will become very big, very quickly, so we need to make the components as small as possible
+
+
+Project Structure:
+-> eShop.Web.Models		-> eShop.Web.AdminPortal 
+						-> eShop.Web.Common
+						-> eShop.Web.CustomerPortal			-> SearchBarComp.razor
+															-> SearchProductComp.razor
+															-> ShoppingCardComp.razor
+															-> ViewProductComp.razor
+
+-> Plugins				-> eShop.DataStore					-> ProductRepository.cs
+						-> eShop.ShoppingCard.LocalStorage	-> ShoppingCard.cs
+						-> eShop.StateStore.DI				-> ShoppingCardStateStore.cs
+															-> StateStoreBase.cs
+
+-> eShop.CoreBusiness	-> Models	: Order.cs, OrderLineItem.cs, Product.cs
+						-> Services	: IOrderService.cs, OrderService.cs
+
+-> eShop.UseCases		-> PluginInterfaces		-> DataStore	: IProductRepository
+												-> StateStore	: IShoppingCardStateStore, IStateStore
+												-> UI			: IShoppingCard
+
+						-> SearchProductScreen	: ISearchProductUseCase, SearchProductUseCase
+
+						-> ShoppingCardScreen	: IViewShoppingCardUseCase, ViewShoppingCardUseCase
+
+						-> ViewProductScreen	: AddProductToCardUseCase, ViewProductUseCase
+
+												  IAddProductToCardUseCase, IViewProductUseCase
+-> eShop.Web			
+
+
+11. Analysis and Design
+
+Clean arhitecture:
+
+a. Application business logic	: everything starts with use cases (SearchProductScreen, ShoppingCardScreen..)
+b. Domain business logic		: Models   (Order.cs, Product.cs, OrderLineItems.cs,)
+								  Services (IOrderService.cs, OrderService.cs -> validations)
+
+Search Product Page:-> Search Product 
+					-> View Product
+
+View Product Page  :-> Navigate Back to Search
+
+-> we have 2 pages with 3 use cases (no domain business logic)
+
+Separation of concerns:
+-> put the UI in separet project 
+-> put the bussines logic in other projects/libraries
+
+DataRepository:	-> a repository class is where we encapsulate all of the data access code, 
+				so we don't need to write those code in the the Application business logic layer
+
+-> in a clean arhitecture, Blazor belong to the UI interface
+
+
+12. Implementing Core Business Layer
+
+-> create a business library project : eShop.CoreBusiness
+
+-> Models -> Products.cs: Id, Brand, Name, Price, ImageLink, Description
+
+Core business logic: 
+-> core business logic exists with/without the existence of the application ???
+
+
+13. Implementing Use Cases Layer
+
+-- eShop.UseCases --
+
+-> add eShop.CoreBusiness reference to the Dependencies
+
+SearchProductScreen :	-> SearchProduct.cs : IEnumerable<Product> Excecute(string filter) { ... }
+						-> ViewProduct.cs	: Product Execute(string filter)
+ViewProductScreen	:
+
+-> usecases can be used by any type of project
+
+
+14. Data Store Plugin Interface
+
+-- eShop.UseCases -- 
+
+-> in order to access the DataStore inside UseCases, we need to define interfaces inside UseCases Layer
+
+PluginInterfaces -> DataStore -> IProductRepository.cs : IEnumerable<Product> Products (string filter)
+														 Product Product(int id)
+														 
+-- SearchProduct.cs --
+
+-> create ctor
+-> create method that return a list of producsts
+	public IEnumerable<Product> Execute(string filter)
+	{
+		return _ProductRepository.GetProducts(filter);
+	}
+
+
+-- ViewProduct.cs --
+
+-> create ctor
+-> create method that returns a Product
+	public Product Execute(int id)
+	{
+		return _ProductRepository.GetProduct(id);
+	}
+
+
+15. Implementing In-Memory Data Store Plugin
+
+-> database or datastore are IO devices
+-> any IO devices should be implemented as plug-ins
+
+
+-> create a new project : eShop.DataStore.HardCoded
+
+-> a good architecture is the architecture that allow you to delaying making decisions
+
+
+-- ProductRepository.cs --
+
+-> create a ctor with a new List<Product> (copy paste the hardcoded data from the resource)
+
+-> return the Product with the specific Id:
+	public Product GetProduct(int id)
+	{
+		return Products.FirstOrDefault(x=> x.Id == id);
+	}
+
+-> return the Products with filter:
+	public IEnumerable<Product> GetProducts(string filter)
+	{
+		if(string.IsWhiteSpaceOrNull(filter))
+			return Products;
+
+		return Products.Where(x => x.Name.ToLower().Contains(filter.ToLower()));
+	}
+
+
+16. Create Search Products Component
+
+-- eShop.UseCases --
+
+-> add interfaces to the classes : ISearchProduct.cs, IViewProduct.cs
+
+
+-- e-Commerce Startup.cs --
+
+-> add dependency injection : 
+	services.AddTranzient<IProductRepository,ProductRepository>();
+	services.AddTranzient<ISearchProduct, SearchProduct>();
+	services.AddTranzient<IViewProduct, ViewProduct>();
+
+<IProductRepository,ProductRepository>() : 
+-> whenever we need to implement a interface, it's going to create a instance of the class 
+
+
+Pages-> Components -> SearchProduct.razor
+
+-- SearchProduct.razor --
+
+@inject ISearchProduct 
+
+
+-> call the Execute() method from dipendecy injections so we can access the list of Products
+@code{
+		OnInitialized()
+		{
+			...
+			-> return the list of Products;		 
+		}
+}
+
+-> check to see if return all 20 Products
+
+
+17. Implementing Search Products Screen
+
+-- SearchProduct.razor --
+
+UI:
+
+<input>
+<button> Search
+
+<ul>
+	<li>
+		@foreach(.....)
+	<li/>
+<ul/>
+
+
+18. Implementing Search Bar Component
+
+-> put the Search Bar into a seperate component
+-> use Boostrap Form template
+
+-- SearchBar.razor --
+
+UI:
+-> create an input with @bind-value ="filter"
+-> create a button with @onclick="HandleSearch"
+
+
+@code:
+-> string filter
+-> EventCallBack<string> OnSearch
+-> HandleSearch()
+
+
+-> use EventCallBack to pass the filter property from the Child to Base Component
+EventCallBack: 
+
+InvokeAsync: invokes the delegate associated with this binding and dispatches an event 
+			 notification to the appropriate component.
+
+-> we use method SearchHandler() to pass the property field to the parent component 
+by using an EventCallback : OnSearch
+
+
+19. Implementing Product Item Component
+
+-- SearchProduct.cs --
+
+UI:
+-> display the List of Products in a table: Name, Brand, Price
+
+-> create component: Shared-> Components -> ProductItemComp.razor
+
+-> debug the app to see how the values from the mother component are passed to the paramenter, 
+so they will be initialized in the child component
+
+
+20. Implementing Filtering
+
+-- SearchProduct.razor --
+
+->  add condition : @if(Products != null && Products.Count() > 0)
+					{ ... }
+-> add filter :
+	HadleSearch(string filter)
+	{
+		products = searchProduct.Execute(filter);
+	}
+
+-> Execute() is in:  eShop.UseCases-> SearchPruductScreen -> SearchProduct.cs
+
+
+21. Styling with Bootstrap
+
+Boostrap site: https://getbootstrap.com/docs/4.0/components/forms/
+	-> Readonly plain text
+
+-- SearchBarComp.razor -- 
+
+-> copy paste from boostrap site and modify it for our needs
+
+
+class="form-group mx-sm-3 mb-2"
+mx-sm-3 : https://getbootstrap.com/docs/4.0/utilities/spacing/
+
+
+22. View Product Details Component
+
+Pages-> Products -> ViewProduct.razor
+
+-- ViewProduct.razor --
+
+@page "/Product/{id:int}"
+
+UI: 
+<div>
+    <img src="@Product.ImageLink" />
+    <br />
+	@Product.Name
+    <br/>
+    @Product.Brand
+    <br/>
+    @Product.Price.ToString("c");
+    <br/>
+    @Product.Description
+</div>
+
+	
+@code:
+
+-> create a parameter that take the value from url
+-> OnParametersSet() : it is called when a parameter is changed
+	-> return the Product with the specified id:
+		viewProduct.Execute(Id);
+
+-> put link to all of the projects to navitate to the ViewProduct.razor
+
+
+Controls-> ProductIntem.razor
+
+-- ProductIntem.razor --
+
+-> add component <NavLink> to the @Product.Name
+
+<NavLink class="nav-link" href=@($"Product/{Product.Id}")>
+    @Product.Name
+</NavLink>    
+
+-> add Bootstrap Card to the ViewProduct.razor: https://getbootstrap.com/docs/4.0/components/card/
+
+-> add a button to go back to the list of Products 
+
+
+

@@ -1,0 +1,137 @@
+﻿2. ASP.NET Core Platform
+
+HttpRequest is incapsulated in HttpContext logic.
+
+-> middleware should be made according to the single resposibility principale
+
+-> Asp.Net Core, the Web server is a console app that runs in a infinite while loop,
+listening to Httprequests 
+
+-> in .net core they are 3 app framework: MVC, RazorPages, Blazor
+-> each of them have different types of Middleware
+
+
+MVC web app or wep API :
+-> model classes, razor views, controller methods
+
+Razer pages:
+-> razor view, corespond code behind model classes
+
+Blazor pages:
+-> blazor components(razor components)
+
+
+3. How a Blazor App is Bootstrapped
+
+Console App works like a webserver when we deploy de app
+
+-- Program.cs --
+
+Web server call the Run()
+
+.Run() -> runs in a infinite loop, listening to HttpRequests and process the request 
+
+
+-- Startup.cs
+
+ConfigureServecies	: dependincy injection  -> inject all of the dependencies that the middleware uses
+											-> import the middleware packages and there dependencies
+Configure			: middleware
+
+app.UseEndpoints(...) -> here we configure our blazor middleware
+
+endpoints.MapFallbackToPage("/_Host") : map all request to this Host page !!!
+
+-> blazor app framework is a single page app framework(SPA)
+
+
+4. Understanding Project Structure
+
+What is an Assembly :
+-> assembly is a collection of types and resources that are built to work together and form a logical unit of functionality
+-> assembly is a precompiled .NET code which can be run by the CLR
+-> puts all the code in a single Unit : Debug !!!
+
+-> dll: dynamic link library
+-> dll can't run itself, it needs a consumer
+-> dll runs in other members space
+-> the point of dll is of reusability(can host it in a .exe, windows, asp.net app)
+
+https://www.youtube.com/watch?v=lx2tSY4joDg&ab_channel=.NETInterviewPreparationvideos
+https://docs.microsoft.com/en-us/dotnet/standard/assembly/#:~:text=NET%20Core%20and%20.,or%20more%20source%20code%20files.&text=NET%20Framework%2C%20assemblies%20can%20contain,to%20create%20a%20single%20assembly.
+
+
+Routing: https://docs.microsoft.com/en-us/aspnet/core/blazor/fundamentals/routing?view=aspnetcore-6.0
+
+_Host.cshtml	-> the entry point of our blazor app
+App.razor		-> the route component
+
+-- App.razor --
+
+<Route AppAssembly="typeof(Program).Assembly"	: we are running in this Assembly
+<Found Context="routeData">						: if it find the location of the user request, then it will 
+													display the main layout component								
+
+<RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+
+<Contex> : is a RanderFragment in the <Found> child component
+
+
+All the Blazor Libraries: 
+https://docs.microsoft.com/en-us/dotnet/api/?view=aspnetcore-5.0
+
+Microsoft.AspNetCore.Routing Namespace
+https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.routing?view=aspnetcore-5.0
+
+Microsoft.AspNetCore.Components
+https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.components?view=aspnetcore-5.0
+
+<Router>
+https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.components.routing.router?view=aspnetcore-5.0
+
+<RouteView>
+https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.components.routeview?view=aspnetcore-5.0
+
+<LayoutView>
+https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.components.layoutview?view=aspnetcore-5.0
+
+
+-- MainLayout.razor
+
+@body -> all our future components will be display in the @body placeholder
+
+public abstract class LayoutComponentBase : ComponentBase
+{  
+	[Parameter]
+	public RenderFragment? Body { get; set; }
+}
+
+
+5. Adding Dynamic Content
+
+-- DynamiComponent.razor --
+
+-> create 2 buttons				: Blazor Server, Blazor WASM
+-> create 2 fields				: title, content
+-> create 2 HandleButtons events: HandleBlazorServerClick(), HandleBlazorWASMClick()
+
+
+
+6. View, State and Event - the Three Main Aspects
+
+State-> View -> Event -> State -> .... 
+
+State :
+
+private string Title
+private string Content
+
+View :
+
+<h3> @title <h3/>
+<h3> @content <h3/>
+
+Event: 
+
+private void ServerClick()		{ ... }
+private void WebAssemblyClick()	{ ... }s

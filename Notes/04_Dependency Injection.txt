@@ -1,0 +1,66 @@
+﻿https://www.youtube.com/watch?v=EPv9-cHEmQw&t=250s&ab_channel=TheSimpleEngineer
+
+// Bussiness logic Layer
+// 1. Procedural Programming Flow of Control(Concrete implementation -> Bad)
+
+class User
+
+// 2. Structured IoC(Abstract implementation -> GOOD)
+
+class User_IoC
+
+// Database Access Layer
+
+class SqlServerDataBase
+class OracleDataBase
+class MySqlDataBase
+
+interface IDataBase
+
+
+
+----- The explanation in the course is not good --
+
+38. Lifetime Management in Blazor Server
+
+-> AddTransient, AddSCoped, AddSingleton : https://www.youtube.com/watch?v=01C8selSVCY&ab_channel=RawCoding
+-> Example in my GitGub Repo with 3 Projects: API, Blazor Server, Blazor Client
+
+
+Singleton:
+-> caching Servicies
+-> Global Configuration
+-> Business Rules
+-> HttpClients 
+-> Persisting stat that's usefull for the runtine of the app
+
+Scoped:
+->Persisting state throughtout app per request
+
+
+
+39. How to choose Lifetime Management
+
+Scoped:
+-> if you want to use some classes to use some data try to implement state management that way, you don't want to use Singleton
+because you are sharing the data across all users
+-> it is used for one particular connection
+-> can't be shared in different browsers
+
+
+40. Lifetime Management in Blazor WebAssembly
+
+-> is the same as in Blazor Server
+
+public static async Task Main(string[] args)
+{
+    var builder = WebAssemblyHostBuilder.CreateDefault(args);
+    builder.RootComponents.Add<App>("#app");
+
+    builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+    builder.Services.AddScoped<ICustomerScoped, CustomerServices>();
+    builder.Services.AddSingleton<ICustomerSingleton, CustomerServices>();
+
+    await builder.Build().RunAsync();
+}

@@ -1,0 +1,82 @@
+﻿@page "/orderdetail/{id:int}"
+
+@attribute [Authorize]
+
+@inject NavigationManager navigationManager
+
+@inject IViewOrderDetailUseCase viewOrderDetailUseCase
+@inject IProcessOrderUseCase processOrderUseCase
+<h3>Order Detail</h3>
+<br />
+
+@if (order != null)
+{
+    <p>
+        <b>Customer Info: </b>
+    </p>
+    <p>@order.CustomerName</p>
+    <p>@order.CustomerAddress</p>
+    <p>@order.CustomerCity</p>
+    <p>@order.CustomerStateProvince</p>
+    <p>@order.CustomerCountry</p>
+    <br />
+    <br />
+    <table class="table col-6">
+        <thead class="thead-dark">
+            <tr>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody class="thead-light">
+            @foreach (var item in order.LineItems)
+            {
+                <tr>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Product.Price</td>
+                    <td>@item.Quantity</td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <br />
+
+    <button type="button" class="btn btn-primary" @onclick="HandleProcessOrder">Mark Order as Processed</button>
+}
+
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    private Order order;
+
+    private AuthenticationState authState;
+
+    [CascadingParameter]
+    public Task<AuthenticationState> authStateTask { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        authState = await authStateTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Id > 0)
+        {
+            order = viewOrderDetailUseCase.Execute(Id); // GetOrder(orderId) ->
+        }
+    }
+
+    public void HandleProcessOrder()
+    {
+        if (order != null && authState != null)
+        {
+            processOrderUseCase.Execute(order.OrderId.Value, authState.User.Identity.Name);
+            navigationManager.NavigateTo("/outstandingorders");
+        }
+    }
+}

@@ -1,0 +1,767 @@
+﻿42. Reorganize Projects for Clean Architecture
+
+Project Structure:
+
+-> eShop.Web.Models		-> eShop.Web.AdminPortal		-> Controls		-> OrderItemComp.razor
+																		-> OrderListComp.razor
+														
+														-> Pages		-> OrderItemComp.razor
+																		-> OrderListComp.razor
+
+						-> eShop.Web.Common				-> Controls		-> Logincomp.razor
+														
+														-> ViewModel	-> LoginViewModel.cs
+														
+						-> eShop.Web.CustomerPortal		-> Controls		-> CardComp.razor
+																		-> CustomerFormComp.razor
+																		-> LineItemComp.razor
+																		-> OrderSummaryComp.razor
+																		-> ProductCardComp.razor
+																		-> ProductItemComp.razor
+																
+														-> Pages		-> OrderConfirmationComp.razor
+																		-> PlaceOrderComp.razor
+																		-> SearchBarComp.razor
+																		-> SearchProductComp.razor
+																		-> ShoppingCardComp.razor
+																		-> ViewProductComp.razor
+														
+														-> ViewModels	-> CustomerViewModel.cs
+	
+-> Plugins				-> eShop.DataStore								-> OrderRepository.cs	
+																		-> ProductRepository.cs
+						
+						-> eShop.DataStore.SQL.Dapper	-> Helpers		-> DataAccess.cs
+																		
+																		-> OrderRepository.cs		
+																		-> ProductRepository.cs
+
+						-> eShop.ShoppingCard.LocalStorage				-> ShoppingCard.cs		
+
+						-> eShop.StateStore.DI							-> ShoppingCardStateStore.cs
+																		-> StateStoreBase.cs
+
+-> eShop.CoreBusiness	-> Models										-> Order.cs
+																		-> OrderLineItems.cs
+																		-> Product.cs
+							
+						-> Services										-> IOrderService.cs
+																		-> OrderService.cs
+							
+-> eShop.UseCases
+
+	-> AdminPortal		-> OrderDetailScreen			-> Interfaces	-> IProcessOrderUseCases.cs
+																		-> IViewOrderDetailUseCase.cs
+																		
+																		-> ProcessOrderUseCase.cs
+																		-> ViewOrderDetailUseCase.cs
+						
+						-> OutStadingOrdersScreen						-> IViewOutstandingOrdersUseCase.cs
+																		-> ViewOutstandingOrdersUseCase.cs
+						
+						-> ProcessedOrdersScreen						-> IViewProcessedOrdersUseCase.cs
+																		-> ViewProcessedOrdersUseCase.cs
+													
+	-> CustomerPortal	-> OrderConfirmationScreen						-> IViewOrderConfirmationUseCase.cs
+																		-> ViewOrderConfirmationUseCase.cs
+						
+						-> PluginInterfaces				-> DataStore	-> IDataAccess.cs
+																		-> IProductRepository.cs
+																		-> IOrderRepository.cs
+																		
+														-> StateStore	-> IShoppingCardStateStore.cs
+																		-> IStateStore.cs
+
+														-> UI			-> IShoppingCard.cs
+
+						-> SearchProductScreen							-> ISearchProductUseCases.cs 
+																		-> SearchProductUseCase.cs
+							
+						-> ShoppingCardScreen			-> Interfaces	-> IDeleteProductUseCase.cs																		
+																		-> IPlaceOrderUseCases.cs																																				
+																		-> IUpdateQuantityUseCase.cs																																				
+																		-> IViewShoppingCardUseCase.cs
+
+																		-> DeleteProductUseCase.cs
+																		-> PlaceOrderUseCases.cs
+																		-> UpdateQuantityUseCase.cs
+																		-> ViewShoppingCardUseCase.cs
+																																	
+						-> ViewProductScreen			-> Interfaces	-> IAddProductToCardUseCase.cs
+																		-> IViewProductUseCase.cs
+
+																		-> AddProductToCardUseCase.cs
+																		-> ViewProductUseCase.cs
+
+-> eShop.Web		-> Controllers										-> AuthenticationController
+
+					-> Shared											-> TopNavBar
+
+
+-- eShop.Web -> App.razor --
+
+AdditionalAssemblies="new[] { typeof(eShop.Web.CustomerPortal.Pages.ViewProductComp).Assembly }"
+
+-> add aditional Assembly to be seen in the eShop.Project
+
+
+
+44. Order Entity and Business Rules
+
+-- eShop.CoreBusiness -> Models --
+
+Order.cs		: OrderID, DatePlaced, DateProcessing, DateProcessed, CustomerName, CustomerAddress, 
+				  CustomerCity, CustomerStateProvince, CustomerCountry, AdminUser
+			      List<OrderLineItem> LineItems, UniqueId
+
+				  List<OrderLineItem> LineItems : each LineItems has a item in it
+
+				  -> void AddProduct(int productId, int qty, double price)
+				  -> void RemoveProduct(int productId)
+
+
+Product.cs		: LineItemId, ProductId, Price, Quantity, OrderId, Product
+
+IOrderService.cs: bool ValidateCustomerInformation(string name, string address, string city, string provice, string country)
+				  bool ValidateCreateOrder(Order order)
+				  bool ValidateUpdateOrder(Order order)
+
+OrderService.cs	: 
+
+OrderLineItem.cs: LineItemId, ProductId, Price, Quantity, OrderId, Product
+
+
+45. Shopping Cart Abstraction
+
+-- eShop.UseCases -> PluginIntefaces -> UI -> IShoppingCard.cs --
+
+-> we make it Async because we use JSRuntime, which is async 
+-> get, add, update, delete order/product from/to LocalStorage
+
+Task<Order> GetOrderAsync();
+Task<Order> AddProductAsync(Product product);
+Task<Order> UpdateQuantityAsync(int productId, int quantity);
+Task<Order> UpdateOrderAsync(Order order);
+Task<Order> DeleteProductAsync(int productId);
+Task<Order> PlaceOrderAsync();        
+Task EmptyAsync();
+
+
+Dictionary:
+
+https://docs.microsoft.com/en-us/aspnet/core/blazor/javascript-interoperability/?view=aspnetcore-6.0
+
+https://www.youtube.com/watch?v=tOA3DZPI4I0&ab_channel=DevExpress
+
+IJSRuntime: an instance of a JavaScript runtime to which calls may be dispatched
+
+ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
+ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args);
+
+
+
+46. Add Product to Shopping Card UseCases
+
+-- eShop.UseCases -> ViewProductSceen --
+
+-> get the product
+-> add the product to the shoppingCard
+
+AddProductToCardUseCase.cs	:	ctor(IProductRepository productRepository, IShoppingCard shoppingCard)	
+								Execute(int productId) 
+								{
+									var product = _productRepository.GetProduct(productId);
+									await _shoppingCard.AddProductAsync(product);
+								}
+
+IAddProductToCardUseCase.cs:  Execute(int productId) 
+
+-- ViewProductComp.razor --
+
+@inject NavigationManager navManager
+@inject IViewProductUseCase viewProduct
+@inject IAddProductToCardUseCase addProductToCard
+
+UI:
+-> create a "AddToCard" button
+
+@code:
+-> add product to card
+-> navigate back to the CatalogPage
+
+
+47. Implementing Shopping Cart Plugin
+
+IJSRuntime: -> calling C# from JS
+
+-> use the local storage of the browser to display the data
+
+-- Plugins -> eShop.ShoppingCard.LocalStorage -> ShoppingCard.cs--
+
+-> add reference: eShop.UseCases
+
+
+-- ShoppingCard.cs --
+
+-> access LocalStorage to get and save the Order in our ShoppingCard
+-> inject JS runtime intro ctor
+-> getting and setting the Order into LocalStorage
+
+
+public static ValueTask InvokeVoidAsync(this IJSRuntime jsRuntime, string identifier, params object[] args);
+
+string identifier = "localStorage.setItem"
+params object[] args = cstrShoppingCard, JsonConvert.SerializeObject(order)
+
+
+SetOrder():
+-> await _jSRuntime.InvokeVoidAsync("localStorage.setItem",
+                                     cstrShoppingCard,
+                                     JsonConvert.SerializeObject(order));
+
+
+Task<Order> GetOrderAsync();
+Task<Order> AddProductAsync(Product product);
+Task<Order> UpdateQuantityAsync(int productId, int quantity);
+Task<Order> UpdateOrderAsync(Order order);
+Task<Order> DeleteProductAsync(int productId);
+Task<Order> PlaceOrderAsync();
+Task SetOrder(Order order);
+Task EmptyAsync();
+
+
+46. Test Add Product to Cart Use Case
+
+-- eShop.Web -> StartUp.cs --
+
+services.AddScoped<IShoppingCard, eShop.ShoppingCard.LocalStorage.ShoppingCard>();
+services.AddTransient<IAddProductToCardUseCase, AddProductToCardUseCase>();
+
+JavaSCript runtime:
+https://developer.mozilla.org/en-US/docs/Web/API/Storage/getItem
+https://blog.logrocket.com/localstorage-javascript-complete-guide/
+
+
+Microsoft.JSInterop Namespace: 
+-> Contains infrastructure for making method calls between .NET and JavaScript in Blazor applications.
+https://docs.microsoft.com/en-us/dotnet/api/microsoft.jsinterop?view=aspnetcore-5.0
+
+
+Local Storage: 
+https://www.youtube.com/watch?v=k8yJCeuP6I8&ab_channel=dcode
+https://www.youtube.com/watch?v=GihQAC1I39Q&t=593s&ab_channel=WebDevSimplified
+
+
+47. Improve UI Layout
+
+https://getbootstrap.com/docs/4.0/components/navbar/
+
+-- eShop.Web -> Shared -> TopNavBar.razor --
+-> copy + paste the navbar from Bootstrap
+-> put the TopNavBar.razor into MainLayout.razor
+
+
+-- eShop.Web -> Pages : --
+-> delete: Index.razor, Counter.razor, FetchData.razor
+
+
+-- eShop.Web.CustomerPortal-> Controls -> ProductCartComp.razor --
+
+UI:
+https://getbootstrap.com/docs/4.0/components/card/
+
+@code:
+[Parameter]
+public Product Product{get;set;}
+
+-- eShop.Web.CustomerPortal -> Pages -> SearchProductComp.razor --
+-> delete the table
+-> use the ProductCardComponent to display the products
+
+
+48. View Shopping Cart Use Case
+
+-- eShop.UseCases -> ShoppingCartScreen -> ViewShoppingCardUseCase.cs --
+
+-> ctor(IShoppingCard shoppingCard)
+-> Execute() : 
+	return shoppingCard.GetOrderAsync();
+
+
+49. View Shopping Cart Component
+
+ShoppingcartComp	-> LineItemComp
+					-> OrderSummaryComp
+
+
+-> Shopping Card is implemented with localstorage, and localstorage is implementing JS interupt
+-> JS interupt can't be used with OnInitialized() because in Blazor Server is triggered twice
+-> we use AfterRendered()
+-> if we call a method of type Task inside of our method, our method need to be Async : AfterRendered()
+
+UI:
+@inject IViewShoppingCartUseCase viewShoppingCardUseCase
+
+@if (order != null && order.LineItems != null && order.LineItems.Count > 0)
+
+-> display <LineItemComp> using "for" or "foreach"
+-> <OrderSummaryComp>
+
+@code{
+	private Order order;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            order = await viewShoppingCardUseCase.Execute();
+            StateHasChanged();
+        }
+    }
+}
+
+StateHasChanged():  Notifies the component that its state has changed. 
+					When applicable, this will cause the component to be re-rendered.
+
+
+50. Order Line Item Component
+
+UI:
+-> check if the product is LineItem & LineItem.Product is not null
+-> create a <li> with class "row" with 3 class colums
+	-> Col 1 :  -> <img src="@LineItem.Product.ImageLink"/>
+	-> Col 2 :	-> @LineItem.Product.Name
+				-> @LineItem.Quantity
+				-> @LineItem.Product.Price.ToString("c");				
+	-> Col 3 :	-> <button @onclick="@(()=> DeleteProduct(LineItem.ProductId))">
+
+@code:
+[Parameter]
+public OrderLineItem LineItem
+
+void HandleQuantityChange()
+void DeleteProduct(int productId)
+
+
+51. Order Summary Component
+
+UI:
+
+Create a Card Bootstrap: card, card-title, card-text, Flex
+
+-> create 4 <div> : -> nr of items				and price: @itemsCount, @itemsTotalPrice.ToString("c")			
+					-> shipping and handling	and price: 
+					-> estimated tax			and price:
+					-> order total				and price: @itemsTotalPrice.ToString("c")
+
+-> create button  : -> @onclick="PlaceOrder"
+
+@code
+int itemsCount = 0;
+double itemsTotalPrice = 0;
+
+[Parameter]
+public Order Order { get; set; }
+
+OnParametersSet()	:   -> if Order is not null
+						-> get the nr of products
+						-> reset the total price
+						-> get the total price with the new number of items
+
+PlaceOrder()		: 
+
+
+52. Shopping Card State Management
+
+INTERFACES
+
+-> save the Sate of a Component outside of the Parent/Child component
+-> use the flex arhitecture
+
+-- eShop.UseCases-> PluginIterfaces -> StateStore --
+
+-- IStateStore.cs --
+void AddStateChangeListeners(Action listener)
+void RemoveStateChangeListeners(Action listener)
+void BroadCastStateChange(Action listener)			
+
+-- IShoppingCardStateStore.cs : IStateStore --
+Task<int> GetItemsCount()
+void UpdateLineItemsCount()
+
+
+-- eShop.UseCases-> ViewProductScreen-> AddProductToCardUseCases.cs --
+
+-> add IShoppingCardStateStore to ctor
+-> Execute()
+	-> add shoppingCardStateStore.UpdateLineItemsCount();
+
+
+IMPLEMENTATION (5:00)
+-- Plugins -> eShop.StateStore.DI --
+
+-- StateStore.cs : IStateStore --
+void AddStateChangeListeners(Action listener)
+void RemoveStateChangeListeners(Action listener)
+void BroadCastStateChange(Action listener)
+
+
+-- ShoppingCardStateStore.cs  : StateStoreBase, IShoppingCardStateStore --
+
+-> ctor(IShoppingCard shoppingCard)
+-> async Task<int> GetItmesCount()
+	-> get the Order: GetOrderAsync();
+	-> check if the order, oderline is null, orderline.count > 0
+-> UpdateLineItemsCount()
+	-> BroadCastStateChange();
+
+
+-- eShop.Web -> Starup.cs --
+
+services.AddScoped<IShoppingCardStateStore, ShoppingCardStateStore>();
+
+Dictionary:
+Action.Invoke() -> Encapsulates a method that has no parameters and does not return a value.
+
+
+53. Shopping Cart Items Count Component
+
+-- eShop.Web.CustomerPortal -> Control -> CardComp.razor--
+
+UI:
+@implements IDisposable
+@inject IShoppingCardStateStore shoppingCardStateStore
+
+Card: @lineItemsCount
+
+@code
+-> create a prop that contains the nr of items
+
+-> OnAfterRenderAsync()
+	-> AddStateChangeListeners(HandleShoppingCardStateChange); 
+	-> GetItmesCount();
+	-> StateHasChanged();
+
+-> HandleShoppingCardStateChange()
+	-> GetItmesCount();
+	-> StateHasChanged();
+
+-> Dispose()
+	-> RemoveStateChangeListeners(HandleShoppingCardStateChange);
+
+-- eShop.Web -> Shared -> TopNavBar.razor --
+-> add a <NavLink> with href="card" 
+	-> add <CardComp/>
+	
+
+54. Delete Product and Update Quantity Use Cases
+
+-- eShop.UseCases -> ShoppingCartScreen -> DeleteProductUseCase.cs --
+
+public async Task<Order> Execute(int productId)
+{
+    var order = await _shoppingCart.DeleteProductAsync(productId);
+    _shoppingCartStateStore.UpdateLineItemsCount();
+
+    return order;
+}
+
+
+-- eShop.UseCases.ShoppingCartScreen -> UpdateQuantityUseCase.cs--
+
+public async Task<Order> Execute(int productId, int quantity)
+{
+    var order = await _shoppingCart.UpdateQuantityAsync(productId, quantity);
+    _shoppingCartStateStore.UpdateProductQuantity();							// manage the global state
+
+    return order;
+}
+
+
+55. Delete and Update with Order Line Item Component
+
+-- eShop.Web -> Startup.cs --
+
+services.AddTransient<IDeleteProductUseCase, DeleteProductUseCase>();
+services.AddTransient<IUpdateQuantityUseCase, UpdateQuantityUseCase>();
+
+
+-- eShop.Web.CustomerPortal -> Controls -> LineItemComp.razor --
+
+UI:
+
+@inject IDeleteProductUseCase deleteProductUseCase
+@inject IUpdateQuantityUseCase updateQuantityUseCase
+
+
+@code:
+[Parameter]
+public EventCallback<Order> OnDeleteProduct { get; set; }
+
+[Parameter]
+public EventCallback<Order> OnUpdateQuantity { get; set; }
+
+
+void Handle QuantityChange(ChangeEventArgs e)
+{
+	if (e.Value == null && string.IsNullOrWhiteSpace(e.Value.ToString()))
+        return;
+
+    int qty;
+
+    if (int.TryParse(e.Value.ToString(), out qty))
+    {
+        if (qty < 0)
+        {
+            return;
+        }
+        var order = await updateQuantityUseCase.Execute(LineItem.ProductId, qty);
+        await OnUpdateQuantity.InvokeAsync(order);
+    }
+}
+
+void DeleteProduct(int productid)
+{
+	var order = await deleteProductUseCase.Execute(productId);
+    await OnDeleteProduct.InvokeAsync(order);
+}
+
+
+-- eShop.Web.CustomerPortal -> Pages -> ShoppingCartComp.razor --
+
+UI:
+<LineItemComp LineItem="order.LineItems[i]"
+              OnDeleteProduct="HandleDeleteProduct"
+              OnUpdateQuantity="HandleUpdateProduct" />
+
+@code:
+
+//because is and EventCallBack we don't need to put StateHasChanged()
+private void HandleDeleteProduct(Order order)
+{
+    this.order = order;       
+}
+
+private void HandleUpdateProduct(Order order)
+{
+    this.order = order;       
+}
+
+
+56. Order Repository
+
+eShop.UseCases.PluginInterfaces.DataStore	: IOrderRepository.cs 
+eShop.DataStore								: OrderRepository.cs
+
+-- IOrderRepository.cs --
+
+Order GetOrder(int id);
+Order GetOrderByUniqueId(string uniqueId);
+int CreateOrder(Order order);
+void UpdateOrder(Order order);
+IEnumerable<Order> GetOrders();
+IEnumerable<Order> GetOutstadingOrders();
+IEnumerable<Order> GetProcessedOrders();
+
+IEnumerable<OrderLineItem> GetLineItemsByOrderId(int orderId);
+
+
+Dictionary:
+
+IEnumerable<> vs List<> vs Array[]:
+https://stackoverflow.com/questions/3628425/ienumerable-vs-list-what-to-use-how-do-they-work
+
+return orders.Values;
+Values : Gets a collection containing the values in the System.Collections.Generic.Dictionary`2
+
+
+57. Place Order Use Case
+
+eShop.UseCases.ShoppingCartScreen.Interfaces	: IPlaceOrderUseCase.cs
+eShop.UseCases.ShoppingCartScreen				: PlaceOrderUseCase.cs
+
+IPlaceOrderUseCase.cs:		
+Task<string> Execute(Order order);
+
+
+PlaceOrderUseCase.cs:
+
+Ctor:  IOrderService, IOrderService, IShoppingCart, IShoppingCartStateStore
+
+Task<string> Execute(Order order);
+{
+	if (_orderService.ValidateCreateOrder(order))
+	{
+		order.DatePlaced = DateTime.Now;
+        order.UniqueId = Guid.NewGuid().ToString();
+        _orderRepository.CreateOrder(order);
+
+        await _shoppingCart.EmptyAsync();
+        _shoppingCartStateStore.UpdateLineItemsCount();
+
+        return order.UniqueId;
+
+	}	
+	else 
+	return null
+}
+
+
+58. Place Order Component
+
+-> PlaceOrderUseCases.cs
+-> PlaceOrderComp.razor
+
+-> CustomerViewModel.cs
+-> CustomerFormComp.razor
+
+
+-- eShop.Web.CustomerPortal -> Pages -> PlaceOrdercomp.razor --
+
+@page "/PlaceOrder"
+
+@inject IViewShoppingCartUseCase viewShoppingCartUseCase
+@inject IPlaceOrderUseCases placeOrderUseCases
+@inject NavigationManager navigationManager
+
+UI:
+-> collect the user information
+	-> collect customer info Component		: CustomerFormComp.razor
+	-> display the order summary Component	: OrderSummary.razor
+
+
+@code:
+
+protected async override void OnAfterRender(bool firstRender)
+{
+    if (firstRender)
+    {
+        order = await viewShoppingCartUseCase.Execute(); // GetOrderAsync() -> GetOrder() -> return order (using JS interupt, localStorage)
+        StateHasChanged();
+    }
+
+	// take the 
+    private async void HandleCustomerInfoSubmited(CustomerViewModel customer)
+    {
+        var mapper = new AutoMapper.MapperConfiguration(cfg
+                => cfg.CreateMap<CustomerViewModel, Order>()).CreateMapper();
+        mapper.Map<CustomerViewModel, Order>(customer, order);
+
+        var orderUniqueId = await placeOrderUseCases.Execute(order);
+
+        /*
+            if (_orderService.ValidateCreateOrder(order))
+            {
+                order.DatePlaced = DateTime.Now;
+                order.UniqueId = Guid.NewGuid().ToString();
+                _orderRepository.CreateOrder(order);
+
+                await _shoppingCart.EmptyAsync();
+                _shoppingCartStateStore.UpdateLineItemsCount();
+
+                return order.UniqueId;
+            }
+            return null;
+        */
+
+
+        if (string.IsNullOrWhiteSpace(orderUniqueId))
+        {
+            //display error msg
+        }
+        else
+        {
+            navigationManager.NavigateTo($"/orderconfirm/{orderUniqueId}");
+        }
+    }
+}
+
+
+-- eShop.WebCustomerPortal -> ViewModels -> CustomerViewModel.cs --
+
+-> add DataAnnotations
+CustomerName
+CustomerAddress 
+CustomerCity 
+CustomerStateProvince
+CustomerCountry
+
+ 
+-- eShop.Web.CustomerPortal -> Controls -> CustomerFormComp.razor --
+
+UI:
+-> create a <EditForm Model="CustomerViewModel" OnValidSubmit="HandleValidSubmit">
+	-> create "form-group" and "form-control" for every CustomerViewModel prop:
+		<div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="customer.CustomerName" class="form-control" />
+        </div>
+
+@code{
+	-> create a CustomerViewModel object 
+	-> create an EventCallBack so we can pass the CustomerViewModel object to the parent component
+		with all the informations
+	-> OnInitialized() : initialize the CustomerViewModel object 
+	-> 
+	private void HandleValidSubmit()
+    {
+        OnCustomerInfoSubmited.InvokeAsync(customer);
+    }
+}
+
+-- eShop.Web -> Startup.cs --
+
+services.AddSingleton<IOrderRepository, OrderRepository>();
+
+services.AddTransient<IPlaceOrderUseCases, PlaceOrderUseCases>();
+services.AddTransient<IOrderService, OrderService>();
+
+
+-- OrderSummaryComp.razor --
+
+-> create a [Parameter] so we can hide the Place Order button
+
+
+59. Order Confirmation Use Case and Screen
+
+-- eShop.UseCases.OrderConfirmationScreen --
+
+-> ViewOrderConfirmationUseCase.cs	: Order Execute(string uniqueId) => return _orderRepository.GetOrderByUniqueId(uniqueId);
+-> IViewOrderConfirmationUseCase.cs	: Order Execute(string uniqueId);
+
+
+-- Startup.cs --
+services.AddTransient<IViewOrderConfirmationUseCase, ViewOrderConfirmationUseCase>();
+
+
+-- eShop.Web.CustomerPortal-> Pages -> OrderConfirmationComp.razor --
+@page "/orderconfirm/{uniqueId}"
+
+UI: 
+
+-> create 5 <p> with : CustomerName, CustomerAddress, CustomerCity, CustomerStateProvince, CustomerCountry
+<OrderSummaryComp Order="order" HidePlaceOrder="true"/>
+
+->create a table with : 
+
+<td>@item.Product.Name</td>
+<td>@item.Quantity</td>
+<td>@item.Product.Price</td>
+
+
+@code{
+	private Order order;
+
+	[Parameter]
+	public string UniqueId {get; set;}
+
+	protected override void OnParameterSet()
+	{
+		if(!string.IsNullOrWhiteSpace(UniqueId))
+		{
+			order = viewOrderConfirmationUseCase.Execute(UniqueId); // GetOrderByUniqueId() -> return order
+		}
+	}
+}
+
+

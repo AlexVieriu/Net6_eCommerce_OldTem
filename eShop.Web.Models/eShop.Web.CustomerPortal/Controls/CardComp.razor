@@ -1,0 +1,42 @@
+﻿@implements IDisposable
+
+@inject NavigationManager navigationManager
+
+@inject IShoppingCartStateStore shoppingCardStateStore
+
+<div>
+    <a class ="nav-link" href="/cart">
+        Card: &nbsp; @lineItemsCount
+    </a>
+</div>
+
+
+@code{
+    private int lineItemsCount = 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            shoppingCardStateStore.AddStateChangeListeners(HandleShoppingCardStateChange);
+            lineItemsCount = await shoppingCardStateStore.GetItemsCount();
+            StateHasChanged();
+        }
+    }
+
+    private async void HandleShoppingCardStateChange()
+    {
+        lineItemsCount = await shoppingCardStateStore.GetItemsCount();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        shoppingCardStateStore.RemoveStateChangeListeners(HandleShoppingCardStateChange);
+    }
+
+    public void NavigateToCart()
+    {
+        navigationManager.NavigateTo("/cart");
+    }
+}

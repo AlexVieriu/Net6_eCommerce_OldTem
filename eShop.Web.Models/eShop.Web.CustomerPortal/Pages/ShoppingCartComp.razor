@@ -1,0 +1,60 @@
+﻿@page "/cart"
+
+@inject IViewShoppingCartUseCase viewShoppingCartUseCase
+
+<h3>Shopping Card</h3>
+<br />
+@if (order != null && order.LineItems != null && order.LineItems.Count > 0)
+{
+    <div class="row">
+        <div class="col-6">
+            <ul>
+                @for (int i = 0; i < order.LineItems.Count; i++)
+                {
+                    <LineItemComp LineItem="order.LineItems[i]"
+                                  OnDeleteProduct="HandleDeleteProduct"
+                                  OnUpdateQuantity="HandleUpdateProduct" />
+
+                    @if (i < order.LineItems.Count - 1)
+                    {
+                        <li style="list-style:none">
+                            <hr />
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+        <div class="col-6">
+            <OrderSummaryComp Order="order" />
+        </div>
+    </div>
+}
+else
+{
+    <p>There are no items in the shopping card</p>
+}
+
+
+@code{
+    private Order order;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            order = await viewShoppingCartUseCase.Execute(); // GetOrderAsync() -> GetOrder()
+            StateHasChanged();
+        }
+    }
+
+    //because is and EventCallBack we don't need to put StateHasChanged()
+    private void HandleDeleteProduct(Order order)
+    {
+        this.order = order;
+    }
+
+    private void HandleUpdateProduct(Order order)
+    {
+        this.order = order;
+    }
+}

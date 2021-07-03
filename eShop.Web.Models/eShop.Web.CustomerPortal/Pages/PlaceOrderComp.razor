@@ -1,0 +1,70 @@
+﻿@page "/Placeholder"
+
+@inject IViewShoppingCartUseCase viewShoppingCartUseCase    
+@inject IPlaceOrderUseCases placeOrderUseCases
+@inject NavigationManager navigationManager
+
+
+@if (order != null)
+{
+    <div class="row">
+        <div class="col">
+            <CustomerFormComp OnCustomerInfoSubmited="HandleCustomerInfoSubmited" />
+        </div>
+        <div class="col">
+            <OrderSummaryComp Order="order" HidePlaceOrder="true"/>
+        </div>
+    </div>
+}
+
+@code{
+    private Order order;
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // one single Order in the LocalStorage
+            order = await viewShoppingCartUseCase.Execute(); // GetOrderAsync() -> GetOrder() -> return order (using JS interupt, localStorage)
+            StateHasChanged();
+        }
+    }
+
+    private async void HandleCustomerInfoSubmited(CustomerViewModel customer)
+    {
+
+        // de ce se mapeaza de la order -> customer si nu invers ???
+
+        var mapper = new AutoMapper.MapperConfiguration(cfg
+                => cfg.CreateMap<CustomerViewModel, Order>()).CreateMapper();
+        mapper.Map<CustomerViewModel, Order>(customer, order);
+
+        var orderUniqueId = await placeOrderUseCases.Execute(order);
+
+        /* .Execute(order):
+
+            if (_orderService.ValidateCreateOrder(order))
+            {
+                order.DatePlaced = DateTime.Now;
+                order.UniqueId = Guid.NewGuid().ToString();
+                _orderRepository.CreateOrder(order);
+
+                await _shoppingCart.EmptyAsync();
+                _shoppingCartStateStore.UpdateLineItemsCount();
+
+                return order.UniqueId;
+            }
+            return null;
+        */
+
+
+        if (string.IsNullOrWhiteSpace(orderUniqueId))
+        {
+            //display error msg
+        }
+        else
+        {
+            navigationManager.NavigateTo($"/orderconfirm/{orderUniqueId}");
+        }
+    }
+}
