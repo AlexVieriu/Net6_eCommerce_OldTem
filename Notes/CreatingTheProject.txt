@@ -81,6 +81,9 @@
     -> LineItemComp.razor (50)
     -> OrderSummaryComp.razor(51)
 
+-> IDeleteProductUseCase, DeleteProductUseCase(54)
+-> IUpdateQuantityUseCase, UpdateQuantityUseCase(54)
+
 -> IStateStore.cs(52)
     void AddStateChangeListeners(Action listener)
     void RemoveStateChangeListeners(Action listener)
