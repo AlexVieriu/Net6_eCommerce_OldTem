@@ -84,18 +84,6 @@
 -> IDeleteProductUseCase, DeleteProductUseCase(54)
 -> IUpdateQuantityUseCase, UpdateQuantityUseCase(54)
 
--> IStateStore.cs(52)
-    void AddStateChangeListeners(Action listener)
-    void RemoveStateChangeListeners(Action listener)
-    void BroadCastStateChange(Action listener)
-
--> IShoppingCartStateStore.cs
--> ShoppingCartStateStore.cs
-    Task<int> GetItemsCount()
-    void UpdateLineItemsCount()
-
--> AddProductToCardUseCases.cs (add IShoppingCartStateStore)
-
 -> CardComp.razor(53)
 
 -> DeleteProductUseCase.cs(54)
@@ -108,6 +96,24 @@
 
 -> PlaceOrderUseCase.cs(57)
 -> IPlaceOrderUseCase.cs
+
+------------------------------
+
+-> IStateStore.cs(52)
+    void AddStateChangeListeners(Action listener)
+    void RemoveStateChangeListeners(Action listener)
+    void BroadCastStateChange(Action listener)
+
+
+-> IShoppingCartStateStore.cs
+-> ShoppingCartStateStore.cs
+    Task<int> GetItemsCount();
+    void UpdateLineItemsCount();
+    void UpdateProductQuantity();
+
+-> AddProductToCardUseCases.cs (add IShoppingCartStateStore)
+
+----------------------------------------
 
 -> PlaceOrderComp.razor(58)
 -> CustomerViewModel.cs
