@@ -84,18 +84,13 @@
 -> IDeleteProductUseCase, DeleteProductUseCase(54)
 -> IUpdateQuantityUseCase, UpdateQuantityUseCase(54)
 
--> CardComp.razor(53)
-
 -> DeleteProductUseCase.cs(54)
--> UpdateQuantityScreen.cs
+-> UpdateQuantityUseCase.cs 
 
--> LineItemComp.razor(55) -> add DeleteProductUseCase, UpdateQuantityScreen to the component 
+-> LineItemComp.razor(55) -> add DeleteProductUseCase, IUpdateQuantityUseCase to the component 
 
 -> IOrderRepository.cs (56)
--> OrderRepository.cs
-
--> PlaceOrderUseCase.cs(57)
--> IPlaceOrderUseCase.cs
+-> OrderRepository.cs : GetORder
 
 ------------------------------
 
@@ -104,7 +99,6 @@
     void RemoveStateChangeListeners(Action listener)
     void BroadCastStateChange(Action listener)
 
-
 -> IShoppingCartStateStore.cs
 -> ShoppingCartStateStore.cs
     Task<int> GetItemsCount();
@@ -112,8 +106,13 @@
     void UpdateProductQuantity();
 
 -> AddProductToCardUseCases.cs (add IShoppingCartStateStore)
+-> DeleteProductUseCase.cs (add IShoppingCartStateStore)
 
+-> CardComp.razor(53)
 ----------------------------------------
+
+-> PlaceOrderUseCase.cs(57)
+-> IPlaceOrderUseCase.cs
 
 -> PlaceOrderComp.razor(58)
 -> CustomerViewModel.cs

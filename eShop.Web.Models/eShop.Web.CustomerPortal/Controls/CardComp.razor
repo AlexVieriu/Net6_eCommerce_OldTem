@@ -6,7 +6,7 @@
 
 <div>
     <a class ="nav-link" href="/cart">
-        Card: &nbsp; @lineItemsCount
+        Card: &nbsp; @lineItemsCount 
     </a>
 </div>
 
@@ -33,10 +33,5 @@
     public void Dispose()
     {
         shoppingCardStateStore.RemoveStateChangeListeners(HandleShoppingCardStateChange);
-    }
-
-    public void NavigateToCart()
-    {
-        navigationManager.NavigateTo("/cart");
     }
 }
