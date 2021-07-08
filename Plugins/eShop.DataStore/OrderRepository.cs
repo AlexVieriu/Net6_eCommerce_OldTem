@@ -16,7 +16,6 @@ namespace eShop.DataStore
 
         public int CreateOrder(Order order)
         {
-
             order.OrderId = orders.Count + 1;
             orders.Add(order.OrderId.Value, order);
             return order.OrderId.Value;             // return the id of the order 
@@ -43,6 +42,7 @@ namespace eShop.DataStore
             //    if (order.UniqueId == uniqueId)
             //        return order;
 
+            // why ForEach here and not at the OrderId, isn't UniqueId, unique?
             foreach (var order in orders)              // look in all the orders
                 if (order.Value.UniqueId == uniqueId)  // and find the order with the UniqueKey
                     return order.Value;                // order is of type Order

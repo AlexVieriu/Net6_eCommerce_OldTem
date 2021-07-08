@@ -89,8 +89,6 @@
 
 -> LineItemComp.razor(55) -> add DeleteProductUseCase, IUpdateQuantityUseCase to the component 
 
--> IOrderRepository.cs (56)
--> OrderRepository.cs : GetORder
 
 ------------------------------
 
@@ -111,8 +109,14 @@
 -> CardComp.razor(53)
 ----------------------------------------
 
+-> IOrderRepository.cs (56)
+-> OrderRepository.cs : CreateOrder(), GetOrder(), GetOrderByUniqueId(), GetOrders()
+                        GetOutstandingsOrders(), GetProcessedOrders(), UpdateOrder()
+
 -> PlaceOrderUseCase.cs(57)
--> IPlaceOrderUseCase.cs
+-> IPlaceOrderUseCase.cs : 
+   -> Execute()
+   -> ctor(IOrderService, IOrderRepository, IShoppingCart, IShoppingCartStateStore)
 
 -> PlaceOrderComp.razor(58)
 -> CustomerViewModel.cs
@@ -121,7 +125,6 @@
 -> ViewOrderConfirmationUseCase.cs
 -> IViewOrderConfirmationUseCase.cs
 -> OrderConfirmationComp.razor 
-
 
 -> ViewOutstandingOrdersUseCase (60)
 -> IViewOutstandingOrdersUseCase

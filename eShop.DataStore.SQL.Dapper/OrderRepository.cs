@@ -75,7 +75,6 @@ namespace eShop.DataStore.SQL.Dapper
             return lineItems;
         }
 
-
         public Order GetOrder(int id)
         {
             var sql = "SELECT * FROM [ORDER] WHERE OrderId = @OrderId";
@@ -84,8 +83,6 @@ namespace eShop.DataStore.SQL.Dapper
 
             return order;
         }
-
-
 
         public Order GetOrderByUniqueId(string uniqueId)
         {
@@ -96,7 +93,6 @@ namespace eShop.DataStore.SQL.Dapper
             return order;
         }
      
-
         public IEnumerable<Order> GetOrders()
         {
             return _dataAccess.Query<Order, dynamic>("select * from [order]", new { });
