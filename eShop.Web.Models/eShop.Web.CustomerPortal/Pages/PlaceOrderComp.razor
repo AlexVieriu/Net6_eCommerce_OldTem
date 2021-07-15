@@ -1,8 +1,9 @@
 ﻿@page "/Placeholder"
 
-@inject IViewShoppingCartUseCase viewShoppingCartUseCase    
-@inject IPlaceOrderUseCases placeOrderUseCases
 @inject NavigationManager navigationManager
+
+@inject IViewShoppingCartUseCase viewShoppingCartUseCase
+@inject IPlaceOrderUseCases placeOrderUseCases
 
 
 @if (order != null)
@@ -12,7 +13,7 @@
             <CustomerFormComp OnCustomerInfoSubmited="HandleCustomerInfoSubmited" />
         </div>
         <div class="col">
-            <OrderSummaryComp Order="order" HidePlaceOrder="true"/>
+            <OrderSummaryComp Order="order" HidePlaceOrder="true" />
         </div>
     </div>
 }

@@ -17,6 +17,5 @@ namespace eShop.UseCases.AdminPortal.OutStandingOrdersScreen
         {
             return _orderRepository.GetOutstandingOrders();
         }
-
     }
 }

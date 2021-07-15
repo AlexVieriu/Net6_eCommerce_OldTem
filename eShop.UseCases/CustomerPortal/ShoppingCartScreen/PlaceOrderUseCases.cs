@@ -39,7 +39,6 @@ namespace eShop.UseCases.ShoppingCartScreen
                 _shoppingCartStateStore.UpdateLineItemsCount();
 
                 return order.UniqueId;
-
             }
 
             return null;

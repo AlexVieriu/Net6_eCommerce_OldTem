@@ -2,8 +2,7 @@
 
 @inject IViewOrderConfirmationUseCase viewOrderConfirmationUseCase
 
-<h3></h3>
-
+<h3>Order Confirmation</h3>
 <br />
 
 @if (order != null)
@@ -24,7 +23,6 @@
             <OrderSummaryComp Order="order" HidePlaceOrder="true" />
         </div>
     </div>
-
 
     <br />
     <table class="table">
@@ -54,13 +52,24 @@
     [Parameter]
     public string UniqueId { get; set; }
 
+    // Dapper
     protected override void OnParametersSet()
     {
-        base.OnParametersSet();
 
         if (!string.IsNullOrWhiteSpace(UniqueId))
         {
             order = viewOrderConfirmationUseCase.Execute(UniqueId); // GetOrderByUniqueId() -> return order
         }
     }
+
+
+    //// Local Storage
+    //protected override void OnAfterRender(bool firstRender)
+    //{
+    //    if (firstRender)
+    //    {
+    //        if(!string.IsNullOrWhiteSpace(UniqueId))
+    //            order = viewOrderConfirmationUseCase.Execute(UniqueId); // GetOrderByUniqueId() -> return order
+    //    }
+    //}
 } 

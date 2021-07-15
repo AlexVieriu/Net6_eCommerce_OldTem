@@ -10,8 +10,8 @@ namespace eShop.UseCases.PluginInterfaces.DataStore
         int CreateOrder(Order order);
         void UpdateOrder(Order order);
         IEnumerable<Order> GetOrders();
-        IEnumerable<Order> GetOutstandingOrders();
-        IEnumerable<Order> GetProcessedOrders();
+        IEnumerable<Order> GetOutstandingOrders();  // for AdminPortal
+        IEnumerable<Order> GetProcessedOrders();    // for AdminPortal
 
         IEnumerable<OrderLineItem> GetLineItemsByOrderId(int orderId);
     }

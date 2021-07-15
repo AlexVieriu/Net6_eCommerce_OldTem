@@ -1,6 +1,8 @@
 using eShop.CoreBusiness.Services;
-using eShop.DataStore.SQL.Dapper;
-using eShop.DataStore.SQL.Dapper.Helpers;
+//using eShop.DataStore.SQL.Dapper;
+//using eShop.DataStore.SQL.Dapper.Helpers;
+using eShop.DataStore;
+
 using eShop.StateStore.DI;
 using eShop.UseCases.AdminPortal.OrderDetailScreen;
 using eShop.UseCases.AdminPortal.OrderDetailScreen.Interfaces;
@@ -46,18 +48,24 @@ namespace eShop.Web
                     
             services.AddRazorPages();
             services.AddServerSideBlazor();
-           
+
+            // For DataStore
+            services.AddSingleton<IProductRepository, ProductRepository>();
+            services.AddSingleton<IOrderRepository, OrderRepository>();
+
             services.AddScoped<IShoppingCart, eShop.ShoppingCard.LocalStorage.ShoppingCart>();
             services.AddScoped<IShoppingCartStateStore, ShoppingCartStateStore>();
 
-            services.AddTransient<IDataAccess>(sp => new DataAccess(Configuration.GetConnectionString("Default")));
-            services.AddTransient<IProductRepository, ProductRepository>();
-            services.AddTransient<IOrderRepository, OrderRepository>();
+            //// For Dapper
+            //services.AddTransient<IDataAccess>(sp => new DataAccess(Configuration.GetConnectionString("Default")));                       
+            //services.AddTransient<IProductRepository, ProductRepository>();
+            //services.AddTransient<IOrderRepository, OrderRepository>();
             services.AddTransient<IOrderService, OrderService>();
 
             services.AddTransient<IViewProductUseCase, ViewProductUseCase>();
             services.AddTransient<ISearchProductUseCase, SearchProductUseCase>();
             services.AddTransient<IAddProductToCartUseCase, AddProductToCartUseCase>();
+
             services.AddTransient<IViewShoppingCartUseCase, ViewShoppingCartUseCase>();
             services.AddTransient<IDeleteProductUseCase, DeleteProductUseCase>();
             services.AddTransient<IUpdateQuantityUseCase, UpdateQuantityUseCase>();

@@ -1,49 +1,58 @@
 ﻿-> Create a the road map
--> add Assembly for CustomerProtal
-
--> SearchBarComp.razor      : Form Bootstrap
--> ProductItemComp.razor    : Card Bootstrap
--> SearchProductsComp.razor
--> ViewProductComp.razor    : Card + Button(Add to Cart) + Button(Back to List)
 
 -> Product.cs
-
--> SearchProductUseCase.cs, ISearchProductUseCase.cs
--> ViewProductUseCase.cs, IViewProductUseCase.cs
--> ProductRepository.cs, IProductReository.cs
--> SearchProductComp.razor
-
 -> Order.cs				:   OrderId, DatePlaced, DateProcessing, DateProcessed, CustomerName, CustomerAddress, 
                             CustomerCity, CustomerStateProvince, CustomerCountry, AdminUser, LineItems, UniqueId, 
 
                             AddProduct(int productId, int qty, double price), RemoveProduct(int productId)
                             
 -> OrderLineItem.cs		:   LineItemId, ProductId, Price, Quantity, OrderId, Product
+
+-> ProductRepository.cs: GetProduct(int id), GetProducts(string filter = null)
+-> IProductReository.cs
+
+-> add Assembly for CustomerProtal
+
+-> SearchProductUseCase.cs, ISearchProductUseCase.cs
+
+-> SearchProductsComp.razor
+-> SearchBarComp.razor      : Form Bootstrap
+-> ProductItemComp.razor    : Card Bootstrap
+
+-> ViewProductUseCase.cs, IViewProductUseCase.cs
+-> ViewProductComp.razor: Card + Button(Add to Cart) + Button(Back to List)
+
+
+-------- Test Application --------
+
 -> OrderService.cs		:
 -> IOrderService.cs		:   bool ValidateCustomerInformation(string name, string address, string city, string province, string country);
                             bool ValidateCreateOrder(Order order);  
                                 -> order has exist
                                 -> order has to have order line items
-                                -> validationg line items (check ProductId, Price, Quantity)
-                                -> ValidateCustomerInformation()
+                                -> validationg line items (check ProductId, Price, Quantity)                                
+                                -> validate customer info
                             bool ValidateProcessOrder(Order order);
                                 -> DataProcessed, AdminUser
                             bool ValidateUpdateOrder(Order order);
                                 -> order has to exist
+                                -> order has OrderId *
                                 -> order has to have order line items
-                                -> Placed Date has to be populate
-                                -> validate uniqueId
                                 -> validation line items
+                                -> DateProcessing has to be populate, DateProcessed don't need to be populated *
+                                -> validate uniqueId *                               
                                 -> validate customer info
+
 -> IShoppingCart(43)
 -> ShoppingCart (45):
 
-    Task<Order> GetOrder()
+   private Task<Order> GetOrder()
         -> get the Product from localStorage     
         -> add the Product
         -> set the Order to the localStorage
     
-    Task SetOrder(Order order)    
+   private Task SetOrder(Order order)    
+
     Task<Order> AddProductAsync(Product product);
         -> get Order
         -> add product
@@ -56,10 +65,14 @@
 
     Task EmptyAsync();
         -> setOrder(null)
-    Task<Order> GetOrderAsync()                                   
+
+    Task<Order> GetOrderAsync()   
+    
     Task<Order> UpdateOrderAsync(Order order)
         -> setOrder
+
     Task<Order> UpdateQuantityAsync(int productId, int quantity); 
+        -> get order
         -> check quantity<0
         -> check quantati == 0
         -> get lineItem
@@ -73,9 +86,10 @@
 -> TopNavBar.razor(47) (Boostrap)
 -> rename ProductItemComp.razor to ProductCartComp.razor
 
+
 ---------- Testing  the app ----------
 
--> ViewShoppingCartUseCase.cs (48)
+-> ViewShoppingCartUseCase.cs (48) : GetOrderAsync();
 
 -> ShoppingCartComp.razor (49) : make it all with class="row" and class="col"
     -> LineItemComp.razor (50)
@@ -107,6 +121,7 @@
 -> DeleteProductUseCase.cs (add IShoppingCartStateStore)
 
 -> CardComp.razor(53)
+
 ----------------------------------------
 
 -> IOrderRepository.cs (56)
@@ -122,29 +137,32 @@
 -> CustomerViewModel.cs
 -> CustomerFormComp.razor
 
+
+------ 6.Build Admin Portal ------ 
+
+-> ViewOutstandingOrdersUseCase (62)
+-> IViewOutstandingOrdersUseCase
+
+-> ViewOrderDetailUseCase(3:44)
+-> IViewOrderDetailUseCase
+
+-> ProcessOrderUseCase(5:10)
+-> IProcessOrderUseCase
+
+-> ViewProcessedOrdersUseCase.cs  (8:30)
+-> IViewProcessedOrdersUseCase.cs
+
 -> ViewOrderConfirmationUseCase.cs
 -> IViewOrderConfirmationUseCase.cs
 -> OrderConfirmationComp.razor 
 
--> ViewOutstandingOrdersUseCase (60)
--> IViewOutstandingOrdersUseCase
 
--> ViewOrderDetailUseCase
--> IViewOrderDetailUseCase
-
--> ProcessOrderUseCase
--> IProcessOrderUseCase
-
-
--> OutStandingOrdersComp.razor(61)
+-> OutStandingOrdersComp.razor(63)
 -> OrderListComp.razor
 -> OrderItemComp.razor
 
 -> OrderDetailComp.razor
 -> ProcessedOrderComp.razor
-
-
------- 6.Build Admin Portal ------ 
 
 -> services.AddControllers()(62)
 -> services.AddAuthentication(...)

@@ -1,5 +1,6 @@
 ﻿using eShop.CoreBusiness.Models;
 using eShop.UseCases.PluginInterfaces.DataStore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,7 +17,7 @@ namespace eShop.DataStore
 
         public int CreateOrder(Order order)
         {
-            order.OrderId = orders.Count + 1;
+            order.OrderId = orders.Count + 1;            
             orders.Add(order.OrderId.Value, order);
             return order.OrderId.Value;             // return the id of the order 
         }
@@ -28,10 +29,12 @@ namespace eShop.DataStore
 
         public Order GetOrder(int id)
         {
-            if (id > 0)
-                return orders.Values.FirstOrDefault(x => x.OrderId == id);
+            return orders[id];
+
+            //if (id > 0)
+            //    return orders.Values.FirstOrDefault(x => x.OrderId == id);
             
-            return null;
+            //return null;
         }
 
         public Order GetOrderByUniqueId(string uniqueId)
