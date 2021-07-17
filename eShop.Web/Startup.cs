@@ -69,6 +69,7 @@ namespace eShop.Web
             services.AddTransient<IViewShoppingCartUseCase, ViewShoppingCartUseCase>();
             services.AddTransient<IDeleteProductUseCase, DeleteProductUseCase>();
             services.AddTransient<IUpdateQuantityUseCase, UpdateQuantityUseCase>();
+
             services.AddTransient<IPlaceOrderUseCases, PlaceOrderUseCases>();
             services.AddTransient<IViewOrderConfirmationUseCase, ViewOrderConfirmationUseCase>();
             services.AddTransient<IViewOutstandingOrdersUseCase, ViewOutstandingOrdersUseCase>();

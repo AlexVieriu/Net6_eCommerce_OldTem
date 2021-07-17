@@ -26,7 +26,7 @@ namespace eShop.ShoppingCard.LocalStorage
             // get the Product from localStorage         
             var order = await GetOrder();
 
-            // add the Product
+            // add the OrderLineItem with the Product already asign with the GetOrder() method
             order.AddProduct(product.ProductId, 1, product.Price);
 
             // set the Order to the localStorage
@@ -76,7 +76,7 @@ namespace eShop.ShoppingCard.LocalStorage
 
             //pass by value, pass by reference
             var lineItem = order.LineItems.SingleOrDefault(x => x.ProductId == productId);
-            if (lineItem != null) 
+            if (lineItem != null)
                 lineItem.Quantity = quantity;
 
             await SetOrder(order);
@@ -98,8 +98,9 @@ namespace eShop.ShoppingCard.LocalStorage
                 await SetOrder(order);
             }
 
+            // we add the Product to the OrderLineItem
             foreach (var item in order.LineItems)
-            {   // items that are hardcoded in the ProductRepository
+            {
                 item.Product = _productRepository.GetProduct(item.ProductId);
             }
 

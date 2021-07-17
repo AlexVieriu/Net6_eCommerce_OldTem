@@ -91,18 +91,15 @@
 
 -> ViewShoppingCartUseCase.cs (48) : GetOrderAsync();
 
--> ShoppingCartComp.razor (49) : make it all with class="row" and class="col"
-    -> LineItemComp.razor (50)
-    -> OrderSummaryComp.razor(51)
+-> ShoppingCartComp.razor (49)      : make it all with class="row" and class="col"
+    -> LineItemComp.razor (50)      : Img, Name, Quantity, Price, Btn(delete)  -  HandleQuantityChange(), DeleteProduct()
+    -> OrderSummaryComp.razor(51)   : LineItems.Count/Price,  Shipping and Handling/0, Estimated Tax/0, 
+                                        Order Total/TotalPrice
 
 -> IDeleteProductUseCase, DeleteProductUseCase(54)
 -> IUpdateQuantityUseCase, UpdateQuantityUseCase(54)
 
--> DeleteProductUseCase.cs(54)
--> UpdateQuantityUseCase.cs 
-
 -> LineItemComp.razor(55) -> add DeleteProductUseCase, IUpdateQuantityUseCase to the component 
-
 
 ------------------------------
 

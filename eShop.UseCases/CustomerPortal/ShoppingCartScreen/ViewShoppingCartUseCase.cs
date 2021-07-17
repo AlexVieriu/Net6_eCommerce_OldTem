@@ -13,9 +13,9 @@ namespace eShop.UseCases.ShoppingCartScreen
         {
             _shoppingCart = shoppingCard;
         }
-        public Task<Order> Execute()
+        public async Task<Order> Execute()
         {
-            return _shoppingCart.GetOrderAsync();
+            return await _shoppingCart.GetOrderAsync();
         }
     }
 }
