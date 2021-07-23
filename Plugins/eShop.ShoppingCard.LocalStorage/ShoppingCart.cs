@@ -45,8 +45,7 @@ namespace eShop.ShoppingCard.LocalStorage
         }
 
         public Task EmptyAsync()
-        {
-            // will stay in the same Key
+        {            
             return SetOrder(null);
         }
 

@@ -130,9 +130,13 @@
    -> Execute()
    -> ctor(IOrderService, IOrderRepository, IShoppingCart, IShoppingCartStateStore)
 
--> PlaceOrderComp.razor(58)
+-> PlaceOrderComp.razor(60)
 -> CustomerViewModel.cs
 -> CustomerFormComp.razor
+
+-> ViewOrderConfirmationUseCase.cs (61)
+-> IViewOrderConfirmationUseCase.cs
+-> OrderConfirmationComp.razor 
 
 
 ------ 6.Build Admin Portal ------ 
@@ -140,18 +144,14 @@
 -> ViewOutstandingOrdersUseCase (62)
 -> IViewOutstandingOrdersUseCase
 
--> ViewOrderDetailUseCase(3:44)
+-> ViewOrderDetailUseCase(3:44)     : GetOrderAsync(int orderId)
 -> IViewOrderDetailUseCase
 
--> ProcessOrderUseCase(5:10)
+-> ProcessOrderUseCase(5:10)        :
 -> IProcessOrderUseCase
 
 -> ViewProcessedOrdersUseCase.cs  (8:30)
 -> IViewProcessedOrdersUseCase.cs
-
--> ViewOrderConfirmationUseCase.cs
--> IViewOrderConfirmationUseCase.cs
--> OrderConfirmationComp.razor 
 
 
 -> OutStandingOrdersComp.razor(63)

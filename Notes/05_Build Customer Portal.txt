@@ -230,7 +230,7 @@ Task SetOrder(Order order);
 Task EmptyAsync();
 
 
-46. Test Add Product to Cart Use Case
+48. Test Add Product to Cart Use Case
 
 -- eShop.Web -> StartUp.cs --
 
@@ -252,7 +252,7 @@ https://www.youtube.com/watch?v=k8yJCeuP6I8&ab_channel=dcode
 https://www.youtube.com/watch?v=GihQAC1I39Q&t=593s&ab_channel=WebDevSimplified
 
 
-47. Improve UI Layout
+48. Improve UI Layout
 
 https://getbootstrap.com/docs/4.0/components/navbar/
 
@@ -279,7 +279,7 @@ public Product Product{get;set;}
 -> use the ProductCardComponent to display the products
 
 
-48. View Shopping Cart Use Case
+50. View Shopping Cart Use Case
 
 -- eShop.UseCases -> ShoppingCartScreen -> ViewShoppingCardUseCase.cs --
 
@@ -288,7 +288,7 @@ public Product Product{get;set;}
 	return shoppingCard.GetOrderAsync();
 
 
-49. View Shopping Cart Component
+51. View Shopping Cart Component
 
 ShoppingcartComp	-> LineItemComp
 					-> OrderSummaryComp
@@ -324,7 +324,7 @@ StateHasChanged():  Notifies the component that its state has changed.
 					When applicable, this will cause the component to be re-rendered.
 
 
-50. Order Line Item Component
+52. Order Line Item Component
 
 UI:
 -> check if the product is LineItem & LineItem.Product is not null
@@ -343,7 +343,7 @@ void HandleQuantityChange()
 void DeleteProduct(int productId)
 
 
-51. Order Summary Component
+53. Order Summary Component
 
 UI:
 
@@ -371,7 +371,7 @@ OnParametersSet()	:   -> if Order is not null
 PlaceOrder()		: 
 
 
-52. Shopping Card State Management
+54. Shopping Card State Management
 
 INTERFACES
 
@@ -424,7 +424,7 @@ Dictionary:
 Action.Invoke() -> Encapsulates a method that has no parameters and does not return a value.
 
 
-53. Shopping Cart Items Count Component
+55. Shopping Cart Items Count Component
 
 -- eShop.Web.CustomerPortal -> Control -> CardComp.razor--
 
@@ -454,7 +454,7 @@ Card: @lineItemsCount
 	-> add <CardComp/>
 	
 
-54. Delete Product and Update Quantity Use Cases
+56. Delete Product and Update Quantity Use Cases
 
 -- eShop.UseCases -> ShoppingCartScreen -> DeleteProductUseCase.cs --
 
@@ -478,7 +478,7 @@ public async Task<Order> Execute(int productId, int quantity)
 }
 
 
-55. Delete and Update with Order Line Item Component
+57. Delete and Update with Order Line Item Component
 
 -- eShop.Web -> Startup.cs --
 
@@ -548,7 +548,7 @@ private void HandleUpdateProduct(Order order)
 }
 
 
-56. Order Repository
+58. Order Repository
 
 eShop.UseCases.PluginInterfaces.DataStore	: IOrderRepository.cs 
 eShop.DataStore								: OrderRepository.cs
@@ -575,7 +575,7 @@ return orders.Values;
 Values : Gets a collection containing the values in the System.Collections.Generic.Dictionary`2
 
 
-57. Place Order Use Case
+59. Place Order Use Case
 
 eShop.UseCases.ShoppingCartScreen.Interfaces	: IPlaceOrderUseCase.cs
 eShop.UseCases.ShoppingCartScreen				: PlaceOrderUseCase.cs
@@ -607,7 +607,7 @@ Task<string> Execute(Order order);
 }
 
 
-58. Place Order Component
+60. Place Order Component
 
 -> PlaceOrderUseCases.cs
 -> PlaceOrderComp.razor
@@ -722,7 +722,7 @@ services.AddTransient<IOrderService, OrderService>();
 -> create a [Parameter] so we can hide the Place Order button
 
 
-59. Order Confirmation Use Case and Screen
+61. Order Confirmation Use Case and Screen
 
 -- eShop.UseCases.OrderConfirmationScreen --
 
@@ -747,7 +747,6 @@ UI:
 <td>@item.Product.Name</td>
 <td>@item.Quantity</td>
 <td>@item.Product.Price</td>
-
 
 @code{
 	private Order order;

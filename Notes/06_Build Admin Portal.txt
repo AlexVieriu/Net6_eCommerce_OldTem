@@ -1,5 +1,4 @@
-﻿
-60. Admin Use Cases
+﻿62. Admin Use Cases
 
 eShop.UseCases.AdminPortal.OrderDetailScreen
 
@@ -19,9 +18,10 @@ eShop.UseCases.AdminPortal.ProcessedOrdersScreen
 -> IViewProcessedOrdersUseCase
 
 
-61. Admin Portal Screens
+63. Admin Portal Screens
 
 -- eShop.Web.AdminPortal.Controls -- 
+-> reference: CoreBusiness, UseCases, Common
 
 -> OrderItemComp.razor
 	 Order
@@ -57,3 +57,6 @@ services.AddTransient<IViewOutstandingOrdersUseCase, ViewOutstandingOrdersUseCas
 services.AddTransient<IProcessOrderUseCase, ProcessOrderUseCase>();
 services.AddTransient<IViewOrderDetailUseCase, ViewOrderDetailUseCase>();
 services.AddTransient<IViewProcessedOrdersUseCase, ViewProcessedOrdersUseCase>();
+
+-> add Assembly
+typeof(eShop.Web.AdminPortal.Pages.OutStandingOrdersComp).Assembly
