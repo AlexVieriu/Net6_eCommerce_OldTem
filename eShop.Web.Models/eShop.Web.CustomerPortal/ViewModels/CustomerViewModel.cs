@@ -5,7 +5,7 @@ namespace eShop.Web.CustomerPortal.ViewModels
     public class CustomerViewModel
     {
         [Required]
-        [StringLength(12, ErrorMessage ="The name must be between 3 and 12 characters")]
+        [StringLength(30, ErrorMessage ="The name must be between 3 and 12 characters")]
         public string CustomerName { get; set; }
 
         [Required]
