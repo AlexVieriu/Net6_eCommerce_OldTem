@@ -3,6 +3,8 @@
 
 @inject ISearchProductUseCase searchRepo
 
+@attribute [Authorize]
+
 <SearchBarComp OnSearch="SearchHandler" />
 
 @if (products != null && products.Count() > 0)

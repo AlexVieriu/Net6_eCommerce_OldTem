@@ -2,7 +2,8 @@
     <Router AppAssembly="@typeof(Program).Assembly"
             AdditionalAssemblies="new[] {
                                         typeof(eShop.Web.CustomerPortal.Pages.ViewProductComp).Assembly,
-                                        typeof(eShop.Web.AdminPortal.Pages.OutStandingOrdersComp).Assembly
+                                        typeof(eShop.Web.AdminPortal.Pages.OutStandingOrdersComp).Assembly,
+                                        typeof(eShop.Web.Common.Controls.LoginComp).Assembly
                                     }"
             PreferExactMatches="@true">
         <Found Context="routeData">

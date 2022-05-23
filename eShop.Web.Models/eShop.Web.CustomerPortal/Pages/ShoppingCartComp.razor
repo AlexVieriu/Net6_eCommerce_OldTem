@@ -2,6 +2,8 @@
 
 @inject IViewShoppingCartUseCase viewShoppingCartUseCase
 
+@attribute [Authorize]
+
 <h3>Shopping Card</h3>
 <br />
 @if (order != null && order.LineItems != null && order.LineItems.Count > 0)

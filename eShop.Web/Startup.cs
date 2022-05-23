@@ -1,7 +1,11 @@
 using eShop.CoreBusiness.Services;
-//using eShop.DataStore.SQL.Dapper;
-//using eShop.DataStore.SQL.Dapper.Helpers;
-using eShop.DataStore;
+
+// For Dapper
+using eShop.DataStore.SQL.Dapper;
+using eShop.DataStore.SQL.Dapper.Helpers;
+
+// For LocalHost
+//using eShop.DataStore;
 
 using eShop.StateStore.DI;
 using eShop.UseCases.AdminPortal.OrderDetailScreen;
@@ -50,16 +54,16 @@ namespace eShop.Web
             services.AddServerSideBlazor();
 
             // For DataStore
-            services.AddSingleton<IProductRepository, ProductRepository>();
-            services.AddSingleton<IOrderRepository, OrderRepository>();
+            //services.AddSingleton<IProductRepository, ProductRepository>();
+            //services.AddSingleton<IOrderRepository, OrderRepository>();
 
             services.AddScoped<IShoppingCart, eShop.ShoppingCard.LocalStorage.ShoppingCart>();
             services.AddScoped<IShoppingCartStateStore, ShoppingCartStateStore>();
 
             //// For Dapper
-            //services.AddTransient<IDataAccess>(sp => new DataAccess(Configuration.GetConnectionString("Default")));                       
-            //services.AddTransient<IProductRepository, ProductRepository>();
-            //services.AddTransient<IOrderRepository, OrderRepository>();
+            services.AddTransient<IDataAccess>(sp => new DataAccess(Configuration.GetConnectionString("Default")));
+            services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<IOrderRepository, OrderRepository>();
             services.AddTransient<IOrderService, OrderService>();
 
             services.AddTransient<IViewProductUseCase, ViewProductUseCase>();

@@ -1,9 +1,10 @@
 ﻿@page "/product/{id:int}"
 
 @inject NavigationManager navManager
-
 @inject IViewProductUseCase viewProduct
 @inject IAddProductToCartUseCase addProductToCard
+
+@attribute [Authorize]
 
 @*Boostrap Card*@
 

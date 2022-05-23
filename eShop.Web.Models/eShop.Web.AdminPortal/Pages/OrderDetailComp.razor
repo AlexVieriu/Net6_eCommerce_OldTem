@@ -1,11 +1,11 @@
 ﻿@page "/orderdetail/{id:int}"
 
-@*@attribute [Authorize]*@
-
 @inject NavigationManager navigationManager
-
 @inject IViewOrderDetailUseCase viewOrderDetailUseCase
 @inject IProcessOrderUseCase processOrderUseCase
+
+@attribute [Authorize]
+
 <h3>Order Detail</h3>
 <br />
 

@@ -1,10 +1,10 @@
 ﻿@page "/Placeholder"
 
 @inject NavigationManager navigationManager
-
 @inject IViewShoppingCartUseCase viewShoppingCartUseCase
 @inject IPlaceOrderUseCases placeOrderUseCases
 
+@attribute [Authorize]
 
 @if (order != null)
 {
